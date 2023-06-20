@@ -21,4 +21,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SPG.Venus.Tierheim.Domain\SPG.Venus.Tierheim.Domain.csproj" />
+    <ProjectReference Include="..\SPG.Venus.Tierheim.Infrastracture\SPG.Venus.Tierheim.Infrastracture.csproj" />
+  </ItemGroup>
 </Project>

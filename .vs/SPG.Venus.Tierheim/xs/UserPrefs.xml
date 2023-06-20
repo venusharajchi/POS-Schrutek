@@ -1,5 +1,39 @@
-﻿<Properties>
-  <MonoDevelop.Ide.ItemProperties.SPG.Venus.Tierheim.Domain.Test FirstBuild="True" />
+﻿<Properties StartupConfiguration="{5646C08C-36CE-41C1-A327-59BE40A4A9D9}|Default">
+  <MonoDevelop.Ide.ItemProperties.SPG.Venus.Tierheim.Domain.Test PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MultiItemStartupConfigurations />
-  <MonoDevelop.Ide.ItemProperties.SPG.Venus.Tierheim.Domain FirstBuild="True" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workbench ActiveDocument="SPG.Venus.Tierheim.Domain.Test/TierheimTest.cs">
+    <Files>
+      <File FileName="SPG.Venus.Tierheim.Infrastracture/TierheimContext.cs" Line="82" Column="52" IsPinned="True" />
+      <File FileName="SPG.Venus.Tierheim.Domain.Test/TierheimTest.cs" Line="18" Column="41" IsPinned="True" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="SPG.Venus.Tierheim" expanded="True">
+            <Node name="SPG.Venus.Tierheim.Domain" expanded="True">
+              <Node name="Model" expanded="True" />
+            </Node>
+            <Node name="SPG.Venus.Tierheim.Domain.Test" expanded="True">
+              <Node name="Dependencies" expanded="True">
+                <Node name="FrameworkReferences" expanded="True" />
+                <Node name="PackageDependencies" expanded="True" />
+              </Node>
+              <Node name="TierheimTest.cs" selected="True" />
+            </Node>
+            <Node name="SPG.Venus.Tierheim.Infrastracture" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="MonoDevelop.UnitTesting.TestPad">
+        <State name="__root__">
+          <Node name="SPG.Venus.Tierheim" expanded="True" selected="True" />
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
 </Properties>
