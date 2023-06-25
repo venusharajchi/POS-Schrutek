@@ -1,7 +1,9 @@
-﻿namespace SPG.Venus.Tierheim.Domain.Model
+﻿using SPG.Venus.Tierheim.Domain.Interfaces;
+
+namespace SPG.Venus.Tierheim.Domain.Model
 {
     // ENTITIY
-    public abstract class Haustier : EntityBase
+    public abstract class Haustier : EntityBase, IFindableByGuid
     {
 
         // PROPERTIES ----------------------------------------------------------

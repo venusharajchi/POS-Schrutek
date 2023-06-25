@@ -1,7 +1,9 @@
-﻿namespace SPG.Venus.Tierheim.Domain.Model
+﻿using SPG.Venus.Tierheim.Domain.Interfaces;
+
+namespace SPG.Venus.Tierheim.Domain.Model
 {
     // ENTITIY
-    public class Personal : EntityBase
+    public class Personal : EntityBase, IFindableByGuid
     {
 
         // PROPERTIES ---------------------------------------------------------
@@ -19,7 +21,7 @@
 
         // NAVIGATION
         public int TierheimhausNavigationId { get; set; }
-        public virtual Tierheimhaus TierheimhausNavigation { get; private set; } = default!;
+        public virtual Tierheimhaus TierheimNavigation { get; private set; } = default!;
 
 
 
@@ -30,14 +32,14 @@
 
 
         public Personal(Guid guid, string vorname, string nachname,
-            Geschlecht geschlecht, string dienstnummer, Tierheimhaus tierheimhausNavigation)
+            Geschlecht geschlecht, string dienstnummer, Tierheimhaus tierheimNavigation)
         {
             Guid = guid;
             Vorname = vorname;
             Nachname = nachname;
             Geschlecht = geschlecht;
             Dienstnummer = dienstnummer;
-            TierheimhausNavigation = tierheimhausNavigation;
+            TierheimNavigation = tierheimNavigation;
         }
 
 

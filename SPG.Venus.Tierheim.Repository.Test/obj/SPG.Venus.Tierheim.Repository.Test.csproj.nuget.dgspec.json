@@ -1,0 +1,258 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository.Test/SPG.Venus.Tierheim.Repository.Test.csproj": {}
+  },
+  "projects": {
+    "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/SPG.Venus.Tierheim.Domain.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/SPG.Venus.Tierheim.Domain.csproj",
+        "projectName": "SPG.Venus.Tierheim.Domain",
+        "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/SPG.Venus.Tierheim.Domain.csproj",
+        "packagesPath": "/Users/dalai/.nuget/packages/",
+        "outputPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/dalai/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.100/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/SPG.Venus.Tierheim.Infrastracture.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/SPG.Venus.Tierheim.Infrastracture.csproj",
+        "projectName": "SPG.Venus.Tierheim.Infrastracture",
+        "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/SPG.Venus.Tierheim.Infrastracture.csproj",
+        "packagesPath": "/Users/dalai/.nuget/packages/",
+        "outputPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/dalai/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/SPG.Venus.Tierheim.Domain.csproj": {
+                "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/SPG.Venus.Tierheim.Domain.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "dependencies": {
+            "Bogus": {
+              "target": "Package",
+              "version": "[34.0.2, )"
+            },
+            "Microsoft.EntityFrameworkCore.Sqlite": {
+              "target": "Package",
+              "version": "[7.0.7, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[7.0.7, )"
+            },
+            "xunit.abstractions": {
+              "target": "Package",
+              "version": "[2.0.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.100/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository.Test/SPG.Venus.Tierheim.Repository.Test.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository.Test/SPG.Venus.Tierheim.Repository.Test.csproj",
+        "projectName": "SPG.Venus.Tierheim.Repository.Test",
+        "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository.Test/SPG.Venus.Tierheim.Repository.Test.csproj",
+        "packagesPath": "/Users/dalai/.nuget/packages/",
+        "outputPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository.Test/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/dalai/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/SPG.Venus.Tierheim.Infrastracture.csproj": {
+                "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/SPG.Venus.Tierheim.Infrastracture.csproj"
+              },
+              "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/SPG.Venus.Tierheim.Repository.csproj": {
+                "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/SPG.Venus.Tierheim.Repository.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.100/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/SPG.Venus.Tierheim.Repository.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/SPG.Venus.Tierheim.Repository.csproj",
+        "projectName": "SPG.Venus.Tierheim.Repository",
+        "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/SPG.Venus.Tierheim.Repository.csproj",
+        "packagesPath": "/Users/dalai/.nuget/packages/",
+        "outputPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/dalai/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net7.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net7.0": {
+            "targetAlias": "net7.0",
+            "projectReferences": {
+              "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/SPG.Venus.Tierheim.Domain.csproj": {
+                "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/SPG.Venus.Tierheim.Domain.csproj"
+              },
+              "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/SPG.Venus.Tierheim.Infrastracture.csproj": {
+                "projectPath": "/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Infrastracture/SPG.Venus.Tierheim.Infrastracture.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net7.0": {
+          "targetAlias": "net7.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.100/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

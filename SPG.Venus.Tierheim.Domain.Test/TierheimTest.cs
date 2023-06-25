@@ -20,7 +20,7 @@ public class TierheimTest
         DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
         optionsBuilder.UseSqlite("Data Source=Tierheim_Test.db");
 
-        TierheimContext db = new TierheimContext(optionsBuilder.Options, output);
+        TierheimContext db = new TierheimContext(optionsBuilder.Options);
         db.Database.EnsureDeleted();
         db.Database.EnsureCreated();
         return db;
@@ -48,7 +48,7 @@ public class TierheimTest
             Katze katze = new Katze(Guid.NewGuid(), isAnschmiegsam: true, "Dora", Geschlecht.Frau, alter: 1);
             Hund hund = new Hund(Guid.NewGuid(), isBissig: true, "Belfi", Geschlecht.Mann, alter: 5);
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
             Personal personal = new Personal(Guid.NewGuid(), "susi", "polter", Geschlecht.Frau, "1234567890", haus);
 
             haus.PersonalAnstellen(personal);
@@ -60,7 +60,7 @@ public class TierheimTest
             context.SaveChanges();
 
             // Assert
-            Tierheimhaus newHaus = context.Tierheimhaeuser
+            Model.Tierheimhaus newHaus = context.Tierheimhaeuser
                 .Include(h => h.Tiere)
                 .First(h => h.Id.Equals(haus.Id));
 
@@ -80,7 +80,7 @@ public class TierheimTest
             Katze katze = new Katze(Guid.NewGuid(), isAnschmiegsam: true, "Dora", Geschlecht.Frau, alter: 1);
 
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
             Personal personal = new Personal(Guid.NewGuid(), "susi", "polter", Geschlecht.Frau, "1234567890", haus);
 
             haus.PersonalAnstellen(personal);
@@ -94,7 +94,7 @@ public class TierheimTest
             context.SaveChanges();
 
             // Assert
-            Tierheimhaus newHaus = context.Tierheimhaeuser
+            Model.Tierheimhaus newHaus = context.Tierheimhaeuser
                 .Include(h => h.Tiere)
                 .First(h => h.Id.Equals(haus.Id));
 
@@ -115,7 +115,7 @@ public class TierheimTest
             Hund hund = new Hund(hundGuid, isBissig: true, "Belfi", Geschlecht.Mann, alter: 5);
 
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
 
             haus.TierInsHeimBringen(hund);
             context.Tierheimhaeuser.Add(haus);
@@ -126,7 +126,7 @@ public class TierheimTest
             context.SaveChanges();
 
             // Assert
-            Tierheimhaus newHaus = context.Tierheimhaeuser
+            Model.Tierheimhaus newHaus = context.Tierheimhaeuser
                 .Include(h => h.Tiere)
                 .First(h => h.Id.Equals(haus.Id));
 
@@ -143,7 +143,7 @@ public class TierheimTest
             // Arrange
             Hund hund = new Hund(Guid.NewGuid(), isBissig: true, "Belfi", Geschlecht.Mann, alter: 5);
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
 
             haus.TierInsHeimBringen(hund);
             context.Tierheimhaeuser.Add(haus);
@@ -154,7 +154,7 @@ public class TierheimTest
             context.SaveChanges();
 
             // Assert
-            Tierheimhaus newHaus = context.Tierheimhaeuser
+            Model.Tierheimhaus newHaus = context.Tierheimhaeuser
                 .Include(h => h.Tiere)
                 .First(h => h.Id.Equals(haus.Id));
             bool alleGeimpft = newHaus.Tiere.All(t => t.IsGeimpft);
@@ -171,7 +171,7 @@ public class TierheimTest
         {
             // Arrange
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
 
             Personal personal = new Personal(Guid.NewGuid(), "susi", "polter", Geschlecht.Frau, "1234567890", haus);
             context.Tierheimhaeuser.Add(haus);
@@ -182,7 +182,7 @@ public class TierheimTest
             context.SaveChanges();
 
             // Assert
-            Tierheimhaus newHaus = context.Tierheimhaeuser
+            Model.Tierheimhaus newHaus = context.Tierheimhaeuser
                 .Include(h => h.Personal)
                 .First(h => h.Id.Equals(haus.Id));
 
@@ -200,7 +200,7 @@ public class TierheimTest
             Katze katze = new Katze(Guid.NewGuid(), isAnschmiegsam: true, "Dora", Geschlecht.Frau, alter: 1);
             Hund hund = new Hund(Guid.NewGuid(), isBissig: true, "Belfi", Geschlecht.Mann, alter: 5);
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
 
             Addresse adresse2 = new Addresse("andere strasse", "10", "linz", "oesterreich");
             Kunde kunde = new Kunde(Guid.NewGuid(), "Venus", "Harajchi", adresse2, Geschlecht.Frau);
@@ -234,7 +234,7 @@ public class TierheimTest
             Katze katze = new Katze(Guid.NewGuid(), isAnschmiegsam: true, "Dora", Geschlecht.Frau, alter: 1);
             Hund hund = new Hund(Guid.NewGuid(), isBissig: true, "Belfi", Geschlecht.Mann, alter: 5);
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
 
             Addresse adresse2 = new Addresse("andere strasse", "10", "linz", "oesterreich");
             Kunde kunde = new Kunde(Guid.NewGuid(), "Venus", "Harajchi", adresse2, Geschlecht.Frau);
@@ -270,7 +270,7 @@ public class TierheimTest
             Katze katze = new Katze(Guid.NewGuid(), isAnschmiegsam: true, "Dora", Geschlecht.Frau, alter: 1);
             Hund hund = new Hund(Guid.NewGuid(), isBissig: true, "Belfi", Geschlecht.Mann, alter: 5);
             Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+            Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
 
             Addresse adresse2 = new Addresse("andere strasse", "10", "linz", "oesterreich");
             Kunde kunde = new Kunde(Guid.NewGuid(), "Venus", "Harajchi", adresse2, Geschlecht.Frau);
@@ -293,7 +293,7 @@ public class TierheimTest
                 .Include(k => k.Tiere)
                 .First(k => k.Id.Equals(kunde.Id));
 
-            Tierheimhaus newHaus = context.Tierheimhaeuser
+            Model.Tierheimhaus newHaus = context.Tierheimhaeuser
                 .Include(h => h.Tiere)
                 .First(h => h.Id.Equals(haus.Id));
 
