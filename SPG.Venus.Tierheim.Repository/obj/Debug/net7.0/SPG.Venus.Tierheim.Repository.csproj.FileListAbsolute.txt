@@ -1,0 +1,17 @@
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/bin/Debug/net7.0/SPG.Venus.Tierheim.Repository.deps.json
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/bin/Debug/net7.0/SPG.Venus.Tierheim.Repository.dll
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/bin/Debug/net7.0/SPG.Venus.Tierheim.Repository.pdb
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.dll
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/bin/Debug/net7.0/SPG.Venus.Tierheim.Infrastracture.dll
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.pdb
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/bin/Debug/net7.0/SPG.Venus.Tierheim.Infrastracture.pdb
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.csproj.AssemblyReference.cache
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.GeneratedMSBuildEditorConfig.editorconfig
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.AssemblyInfoInputs.cache
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.AssemblyInfo.cs
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.csproj.CoreCompileInputs.cache
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.csproj.CopyComplete
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.dll
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/refint/SPG.Venus.Tierheim.Repository.dll
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/SPG.Venus.Tierheim.Repository.pdb
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Repository/obj/Debug/net7.0/ref/SPG.Venus.Tierheim.Repository.dll

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.Domain.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.Infrastracture", "SPG.Venus.Tierheim.Infrastracture\SPG.Venus.Tierheim.Infrastracture.csproj", "{CFE81624-8EBF-4B4D-BC7E-06345521236A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.Repository", "SPG.Venus.Tierheim.Repository\SPG.Venus.Tierheim.Repository.csproj", "{00933E62-FCA3-4307-B3C8-CFC3245B23D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.RepositoryTest", "SPG.Venus.Tierheim.RepositoryTest\SPG.Venus.Tierheim.RepositoryTest.csproj", "{07D280FB-960B-4C63-883F-62AB93C8576E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{CFE81624-8EBF-4B4D-BC7E-06345521236A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFE81624-8EBF-4B4D-BC7E-06345521236A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFE81624-8EBF-4B4D-BC7E-06345521236A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00933E62-FCA3-4307-B3C8-CFC3245B23D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00933E62-FCA3-4307-B3C8-CFC3245B23D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00933E62-FCA3-4307-B3C8-CFC3245B23D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00933E62-FCA3-4307-B3C8-CFC3245B23D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07D280FB-960B-4C63-883F-62AB93C8576E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07D280FB-960B-4C63-883F-62AB93C8576E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07D280FB-960B-4C63-883F-62AB93C8576E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07D280FB-960B-4C63-883F-62AB93C8576E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

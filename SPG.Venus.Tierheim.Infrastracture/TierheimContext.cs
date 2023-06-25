@@ -8,8 +8,6 @@ namespace SPG.Venus.Tierheim.Infrastructure
 {
     public class TierheimContext : DbContext
     {
-        private readonly ITestOutputHelper output;
-
         public DbSet<Addresse> Adressen => Set<Addresse>();
         public DbSet<Haustier> Haustiere => Set<Haustier>();
         public DbSet<Hund> Hunde => Set<Hund>();
@@ -18,15 +16,12 @@ namespace SPG.Venus.Tierheim.Infrastructure
         public DbSet<Personal> Personal => Set<Personal>();
         public DbSet<Tierheimhaus> Tierheimhaeuser => Set<Tierheimhaus>();
 
-        public TierheimContext(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+        public TierheimContext() { }
 
-        public TierheimContext(DbContextOptions options, ITestOutputHelper output)
+        public TierheimContext(DbContextOptions options)
             : base(options)
         {
-            this.output = output;
+
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -34,6 +29,8 @@ namespace SPG.Venus.Tierheim.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Tierheimhaus>().HasKey(h => h.Name);
+
             // Value Objects
             modelBuilder.Entity<Kunde>().OwnsOne(k => k.Adresse);
             modelBuilder.Entity<Tierheimhaus>().OwnsOne(th => th.Adresse);
@@ -78,8 +75,8 @@ namespace SPG.Venus.Tierheim.Infrastructure
             SaveChanges();
 
 
-            output.WriteLine("1- haustiere ------------------");
-            output.WriteLine(haustiere.ToString());
+            //output.WriteLine("1- haustiere ------------------");
+            //output.WriteLine(haustiere.ToString());
 
 
 
@@ -106,8 +103,8 @@ namespace SPG.Venus.Tierheim.Infrastructure
             SaveChanges();
 
 
-            output.WriteLine("2- Kunden ------------------");
-            output.WriteLine(kunden.ToString());
+            //output.WriteLine("2- Kunden ------------------");
+            //output.WriteLine(kunden.ToString());
 
 
 
@@ -117,6 +114,7 @@ namespace SPG.Venus.Tierheim.Infrastructure
             List<Tierheimhaus> tierheimhauser = new Faker<Tierheimhaus>("de")
                 .CustomInstantiator(f => new Tierheimhaus(
                     f.Random.Guid(),
+                    f.Person.Company.Name,
                     new Addresse(
                     f.Address.StreetName(),
                     f.Address.BuildingNumber(),
@@ -132,8 +130,8 @@ namespace SPG.Venus.Tierheim.Infrastructure
             SaveChanges();
 
 
-            output.WriteLine("3- Tierheimhäuser ------------------");
-            output.WriteLine(tierheimhauser.ToString());
+            //output.WriteLine("3- Tierheimhäuser ------------------");
+            //output.WriteLine(tierheimhauser.ToString());
 
 
 
@@ -155,8 +153,8 @@ namespace SPG.Venus.Tierheim.Infrastructure
             SaveChanges();
 
 
-            output.WriteLine("4- Personal ------------------");
-            output.WriteLine(personal.ToString());
+            //output.WriteLine("4- Personal ------------------");
+            //output.WriteLine(personal.ToString());
 
 
 
@@ -171,7 +169,7 @@ namespace SPG.Venus.Tierheim.Infrastructure
 
 
             SaveChanges();
-            output.WriteLine("5- ALLES OKAY ------------------");
+            //output.WriteLine("5- ALLES OKAY ------------------");
 
         }
     }

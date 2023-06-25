@@ -11,6 +11,9 @@
         public Addresse Adresse { get; set; }
 
 
+        public String Name { get; set; }
+
+
         // Wann ist das Heim geöffnet
         public DateTime OeffungszeitVon { get; set; }
         public DateTime OeffungszeitBis { get; set; }
@@ -32,10 +35,11 @@
         protected Tierheimhaus() { }
 
 
-        public Tierheimhaus(Guid guid, Addresse adresse,
+        public Tierheimhaus(Guid guid, String name, Addresse adresse,
             DateTime oeffungszeitVon, DateTime oeffungszeitBis)
         {
             Guid = guid;
+            Name = name;
             Adresse = adresse;
             OeffungszeitVon = oeffungszeitVon;
             OeffungszeitBis = oeffungszeitBis;
