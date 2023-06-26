@@ -123,7 +123,7 @@ namespace SPG.Venus.Tierheim.Infrastructure
                 f.Date.Between(DateTime.Now.AddHours(-8), DateTime.Now.AddHours(-1)),
                 f.Date.Between(DateTime.Now.AddHours(1), DateTime.Now.AddHours(8))
             ))
-            .RuleFor(t => t.Tiere, f => f.Random.ListItems(haustiere, f.Random.Int(1, 10)).ToList())
+            .RuleFor(t => t.Tiere, f => f.Random.ListItems(haustiere, f.Random.Int(5, 10)).ToList())
             .Generate(10);
 
             Tierheimhaeuser.AddRange(tierheimhauser);

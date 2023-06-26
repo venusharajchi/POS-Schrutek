@@ -1,11 +1,11 @@
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.deps.json
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.dll
+/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.pdb
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/SPG.Venus.Tierheim.Domain.csproj.AssemblyReference.cache
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/SPG.Venus.Tierheim.Domain.GeneratedMSBuildEditorConfig.editorconfig
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/SPG.Venus.Tierheim.Domain.AssemblyInfoInputs.cache
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/SPG.Venus.Tierheim.Domain.AssemblyInfo.cs
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/SPG.Venus.Tierheim.Domain.csproj.CoreCompileInputs.cache
-/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.deps.json
-/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.dll
-/Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/bin/Debug/net7.0/SPG.Venus.Tierheim.Domain.pdb
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/SPG.Venus.Tierheim.Domain.dll
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/refint/SPG.Venus.Tierheim.Domain.dll
 /Users/dalai/Desktop/SPG.Venus.Tierheim/SPG.Venus.Tierheim.Domain/obj/Debug/net7.0/SPG.Venus.Tierheim.Domain.pdb
