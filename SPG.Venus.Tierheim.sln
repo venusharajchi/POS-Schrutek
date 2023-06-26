@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.Reposito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.RepositoryTest", "SPG.Venus.Tierheim.RepositoryTest\SPG.Venus.Tierheim.RepositoryTest.csproj", "{07D280FB-960B-4C63-883F-62AB93C8576E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.Application", "SPG.Venus.Tierheim.Application\SPG.Venus.Tierheim.Application.csproj", "{0139D9E1-E5DD-4199-9695-BF76110B1644}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPG.Venus.Tierheim.ApplicationTest", "SPG.Venus.Tierheim.ApplicationTest\SPG.Venus.Tierheim.ApplicationTest.csproj", "{06F593F2-3818-4BF1-8567-B5664B36EA49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{07D280FB-960B-4C63-883F-62AB93C8576E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07D280FB-960B-4C63-883F-62AB93C8576E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07D280FB-960B-4C63-883F-62AB93C8576E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0139D9E1-E5DD-4199-9695-BF76110B1644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0139D9E1-E5DD-4199-9695-BF76110B1644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0139D9E1-E5DD-4199-9695-BF76110B1644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0139D9E1-E5DD-4199-9695-BF76110B1644}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06F593F2-3818-4BF1-8567-B5664B36EA49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06F593F2-3818-4BF1-8567-B5664B36EA49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06F593F2-3818-4BF1-8567-B5664B36EA49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06F593F2-3818-4BF1-8567-B5664B36EA49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

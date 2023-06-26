@@ -34,6 +34,27 @@ namespace SPG.Venus.Tierheim.Repository.Tierheim
             }
         }
 
+        public void Update(Tierheimhaus entity)
+        {
+            try
+            {
+                Tierheimhaus? existingEntity = _db.Set<Tierheimhaus>().Find(entity.Name);
+
+                if (existingEntity == null)
+                    throw new RepositoryException($"Tierheimhaus with id {entity.Id} not found!");
+                
+                // If the entity exists in the database, update its properties.
+                 _db.Entry(existingEntity).CurrentValues.SetValues(entity);
+                 _db.SaveChanges();
+                
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new RepositoryException("Update nicht möglich!", ex);
+            }
+        }
+
+
         public IQueryable<Tierheimhaus> GetAll()
         {
             return _db.Set<Tierheimhaus>();

@@ -1,6 +1,8 @@
-﻿namespace SPG.Venus.Tierheim.Domain.Model
+﻿using SPG.Venus.Tierheim.Domain.Interfaces;
+
+namespace SPG.Venus.Tierheim.Domain.Model
 {
-    public class Kunde : EntityBase
+    public class Kunde : EntityBase, IFindableByGuid
     {
 
         // PROPERTIES ----------------------------------------------------------
@@ -17,6 +19,7 @@
 
 
         private List<Haustier> _tiere = new();
+        // Lambda function
         public virtual IReadOnlyList<Haustier> Tiere => _tiere;
 
 

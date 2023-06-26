@@ -60,6 +60,7 @@ public class TierheimTest
             context.SaveChanges();
 
             // Assert
+            // LINQ
             Model.Tierheimhaus newHaus = context.Tierheimhaeuser
                 .Include(h => h.Tiere)
                 .First(h => h.Id.Equals(haus.Id));
