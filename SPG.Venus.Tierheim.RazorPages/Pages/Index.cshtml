@@ -1,0 +1,36 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<style>
+    .banner-image {
+        width: 100%;
+        max-height: 400px;
+    }
+
+    .button-container {
+        margin-top: 20px;
+    }
+
+    .enter-button {
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+
+ 
+</style>
+
+<div class="text-center">
+    <img class="banner-image" src="https://www.naturavetal.at/wp-content/uploads/2018/03/Naturavetal_Ratgeber_Tierheimhund.jpg.webp" alt="Tierheim Banner">
+</div>
+
+<div class="text-center button-container">
+    <a class="enter-button" href="/Tierheim">Enter Tierheim Übersicht</a>
+</div>

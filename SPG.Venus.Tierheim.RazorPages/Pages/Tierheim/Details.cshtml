@@ -1,0 +1,98 @@
+﻿@page
+@model SPG.Venus.Tierheim.RazorPages.Pages.Tierheim.DetailsModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"] - @Model.Tierheim.Name</title>
+    <style>
+        .header-info {
+            margin-bottom: 20px;
+        }
+
+        .header-info div {
+            margin-bottom: 10px;
+        }
+
+        .personal-table, .tiere-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .personal-table th, .personal-table td, .tiere-table th, .tiere-table td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .personal-table th, .tiere-table th {
+            background-color: #f5f5f5;
+        }
+
+        .personal-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>@Model.Tierheim.Name</h2>
+
+        <div class="header-info">
+            <div><strong>ID:</strong> @Model.Tierheim.Id</div>
+            <div><strong>Name:</strong> @Model.Tierheim.Name</div>
+            <div><strong>Address:</strong> @Model.Tierheim.Adresse.Strasse, @Model.Tierheim.Adresse.Hausnummer, @Model.Tierheim.Adresse.Stadt, @Model.Tierheim.Adresse.Land</div>
+            <div><strong>Öffnungszeit Von:</strong> @Model.Tierheim.OeffungszeitVon</div>
+            <div><strong>Öffnungszeit Bis:</strong> @Model.Tierheim.OeffungszeitBis</div>
+        </div>
+
+        <h3>Personal</h3>
+        <table class="personal-table">
+            <thead>
+                <tr>
+                    <th>Dienstnummer</th>
+                    <th>Vorname</th>
+                    <th>Nachname</th>
+                    <th>Geschlecht</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var personal in Model.Tierheim.Personal)
+                {
+                    <tr>
+                        <td>@personal.Dienstnummer</td>
+                        <td>@personal.Vorname</td>
+                        <td>@personal.Nachname</td>
+                        <td>@personal.Geschlecht</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <br />
+
+        <h3>Tiere</h3>
+        <table class="tiere-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Geschlecht</th>
+                    <th>Alter</th>
+                    <th>IsGeimpft</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tier in Model.Tierheim.Tiere)
+                {
+                    <tr>
+                        <td>@tier.Name</td>
+                        <td>@tier.Geschlecht</td>
+                        <td>@tier.Alter</td>
+                        <td>@tier.IsGeimpft</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

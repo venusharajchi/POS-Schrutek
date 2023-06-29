@@ -1,0 +1,109 @@
+﻿@page
+@model SPG.Venus.Tierheim.RazorPages.Pages.Tierheim.CreateModel
+
+<style>
+    .form-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+
+        .form-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+    form {
+        width: 500px;
+        margin: 0 auto;
+        padding: 30px;
+        background-color: #f5f5f5;
+        border: 1px solid #e5e5e5;
+        border-radius: 5px;
+    }
+
+    label {
+        display: block;
+        margin: 10px 0;
+        font-weight: bold;
+    }
+
+    input[type="text"], input[type="date"] {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+
+    .text-danger {
+        color: red;
+        font-size: 12px;
+    }
+
+    input[type="submit"] {
+        margin-top: 20px;
+        padding: 10px 20px;
+        border: none;
+        color: white;
+        background-color: #007bff;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+</style>
+
+
+<h2>Add Tierheimhaus</h2>
+
+
+<div class="form-container">
+    <img src="https://media.os.fressnapf.com/cms/2020/05/Ratgeber_Katze_Erziehung_KatzeKaefig_1200x527.jpg?t=cmsimg_920&f=webp" alt="Katze in Käfig">
+
+    <form method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div>
+            <label for="name">Name</label>
+            <input id="name" asp-for="NewTierheimDto.Name" value="Mein schönes Tierheim" />
+            <span asp-validation-for="NewTierheimDto.Name" class="text-danger"></span>
+        </div>
+        <div>
+            <label for="street">Street</label>
+            <input id="street" asp-for="NewTierheimDto.Street" value="Spengergasse" />
+            <span asp-validation-for="NewTierheimDto.Street" class="text-danger"></span>
+        </div>
+        <div>
+            <label for="number">House Number</label>
+            <input id="number" asp-for="NewTierheimDto.Number" value="6" />
+            <span asp-validation-for="NewTierheimDto.Number" class="text-danger"></span>
+        </div>
+        <div>
+            <label for="city">City</label>
+            <input id="city" asp-for="NewTierheimDto.City" value="Wien" />
+            <span asp-validation-for="NewTierheimDto.City" class="text-danger"></span>
+        </div>
+        <div>
+            <label for="country">Country</label>
+            <input id="country" asp-for="NewTierheimDto.Country" value="Österreich" />
+            <span asp-validation-for="NewTierheimDto.Country" class="text-danger"></span>
+        </div>
+        <div>
+            <label for="startDate">Öffnungszeit Von</label>
+            <input id="startTime" type="time" asp-for="NewTierheimDto.StartDate" />
+            <span asp-validation-for="NewTierheimDto.StartDate" class="text-danger"></span>
+        </div>
+        <div>
+            <label for="endDate">Öffnungszeit Bis</label>
+            <input id="endTime" type="time" asp-for="NewTierheimDto.EndDate" />
+            <span asp-validation-for="NewTierheimDto.EndDate" class="text-danger"></span>
+        </div>
+        <div>
+            <input type="submit" value="Create" />
+        </div>
+    </form>
+</div>

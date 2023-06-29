@@ -1,0 +1,39 @@
+﻿@page
+@model SPG.Venus.Tierheim.RazorPages.Pages.Tierheim.IndexModel
+@{
+}
+
+<h2>Übersicht Tierheime</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Geöffnet Von</th>
+            <th>Geöffnet Bis</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Tierheims)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Name</td>
+                <td>@item.Adresse.Strasse, @item.Adresse.Hausnummer, @item.Adresse.Stadt, @item.Adresse.Land</td>
+                <td>@item.OeffungszeitVon</td>
+                <td>@item.OeffungszeitBis</td>
+                <td>
+                    <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+
+
+    </tbody>
+</table>
+
+<a asp-page="./Create">Create New</a>
