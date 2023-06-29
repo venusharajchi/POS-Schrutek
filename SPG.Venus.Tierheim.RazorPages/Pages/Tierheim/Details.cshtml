@@ -47,6 +47,7 @@
         </div>
 
         <h3>Personal</h3>
+
         <table class="personal-table">
             <thead>
                 <tr>
@@ -69,9 +70,15 @@
             </tbody>
         </table>
 
+        @if (!Model.Tierheim.Tiere.Any())
+        {
+            <p>Es gibt noch kein Personal Heim angestellt</p>
+        }
+
         <br />
 
         <h3>Tiere</h3>
+
         <table class="tiere-table">
             <thead>
                 <tr>
@@ -93,6 +100,15 @@
                 }
             </tbody>
         </table>
+
+        @if (!Model.Tierheim.Tiere.Any())
+        {
+            <p>Es gibt noch keine Tiere im Heim</p>
+        }
+
     </div>
+
+    <a href="/Tierheim" class="btn btn-primary">Back to Tierheim</a>
+
 </body>
 </html>
