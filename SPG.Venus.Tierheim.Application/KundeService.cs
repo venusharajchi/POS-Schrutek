@@ -203,7 +203,7 @@ namespace SPG.Venus.Tierheim.Application
             }
             catch (KundeRepositoryException ex)
             {
-                throw new KundenServiceException(
+                throw new KundeServiceException(
                     "KundenService#DeleteKunde: Kunden DB Error", ex);
             }
         }
