@@ -1,192 +1,203 @@
-﻿using System.Text;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using SPG.Venus.Tierheim.Domain.Model;
+using SPG.Venus.Tierheim.Repository;
+using SPG.Venus.Tierheim.Infrastructure;
+using Xunit;
+using SPG.Venus.Tierheim.Domain.Exceptions;
+using System.Text;
+using System.Linq;
 using SPG.Venus.Tierheim.Application;
 using SPG.Venus.Tierheim.Domain.Dtos;
-using SPG.Venus.Tierheim.Domain.Exceptions;
 using SPG.Venus.Tierheim.Domain.Interfaces;
-using SPG.Venus.Tierheim.Domain.Model;
-using SPG.Venus.Tierheim.Infrastructure;
-using SPG.Venus.Tierheim.Repository;
-using SPG.Venus.Tierheim.RepositoryTest.Helpers;
 
-namespace SPG.Venus.Tierheim.ApplicationTest
+namespace SPG.Venus.Tierheim.Test.Application
 {
-    public class KundeServiceTest
+    public class KundenServiceTest : IDisposable
     {
-        private KundeService InitUnitToTest(TierheimContext db)
+        private readonly KundenService _kundenService;
+        private readonly TierheimService _tierheimService;
+        private readonly TierheimContext _context;
+
+        public KundenServiceTest()
         {
-            return new KundeService
-            (
-                new KundeRepository(db),
-                new TierheimRepository(db),
-                new RepositoryBase<Kunde>(db),
-                new RepositoryBase<Tierheimhaus>(db)
-            );
+            _context = GenerateDb();
+            var kundenRepository = new KundeRepository(_context);
+            var tierheimRepository = new TierheimRepository(_context);
+
+            var kundeValidationService = new KundeValidationService(kundenRepository);
+            var tierheimValidationService = new TierheimValidationService(tierheimRepository);
+
+            _kundenService = new KundenService(
+                kundenRepository, kundeValidationService,
+                tierheimRepository, tierheimValidationService);
+
+            _tierheimService = new TierheimService(
+                tierheimRepository, tierheimValidationService);
         }
 
 
-        private DbContextOptions GenerateDbOptions()
+        public TierheimContext GenerateDb()
         {
-            SqliteConnection connection = new SqliteConnection("Data Source = :memory:");
-            connection.Open();
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
+            optionsBuilder.UseSqlite("Data Source=Tierheim_Test.db");
 
-            DbContextOptionsBuilder options = new DbContextOptionsBuilder();
-            options.UseSqlite(connection);
-            return options.Options;
+            TierheimContext db = new TierheimContext(optionsBuilder.Options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            return db;
         }
 
 
-
-        [Fact]
-        public void NewKunde_Success_Test()
+        public void Dispose()
         {
-            // Arrange
-            using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-            {
-                // Setup DB
-                KundeService unitToTest = InitUnitToTest(db);
-                DatabaseUtilities.InitializeDatabase(db);
-
-                // Setup Dto
-                NewKundeDto entity = new NewKundeDto()
-                {
-                    Vorname = "Test Vorname",
-                    Nachname = "Test Nachname",
-                    Street = "Test Street",
-                    Number = "123",
-                    City = "Test City",
-                    Country = "Test Country",
-                    Geschlecht = Geschlecht.Frau
-                };
-
-                // Act
-                unitToTest.NewKunde(entity);
-
-                // Assert
-                var createdKunde = db.Kunden.FirstOrDefault(t => t.Vorname == "Test Vorname" && t.Nachname == "Test Nachname");
-                Assert.NotNull(createdKunde);
-                Assert.Equal("Test Vorname", createdKunde.Vorname);
-                Assert.Equal("Test Nachname", createdKunde.Nachname);
-                Assert.Equal("Test Street", createdKunde.Adresse.Strasse);
-                Assert.Equal("123", createdKunde.Adresse.Hausnummer);
-                Assert.Equal("Test City", createdKunde.Adresse.Stadt);
-                Assert.Equal("Test Country", createdKunde.Adresse.Land);
-                Assert.Equal(Geschlecht.Frau, createdKunde.Geschlecht);
-            }
-        }
-
-
-
-
-        [Fact]
-        public void GetAll_AscendingSortAndPaging_Test()
-        {
-            // Arrange
-            using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-            {
-                // Setup DB
-                DatabaseUtilities.InitializeDatabase(db);
-                KundeService unitToTest = InitUnitToTest(db);
-
-                // Act
-                var result = unitToTest.GetAll(1, 3, "asc_sort");
-
-                // Assert
-                Assert.NotNull(result);
-                Assert.Equal(3, result.Count);
-                Assert.True(string.Compare(result[0].Nachname, result[1].Nachname) < 0);
-                Assert.True(string.Compare(result[1].Nachname, result[2].Nachname) < 0);
-            }
+            _context.Dispose();
         }
 
 
 
         [Fact]
-        public void GetAll_DescendingSortAndPaging_Test()
+        public void NewKunde_AddsNewKundeToDatabase_WhenValidEntityProvided()
         {
-            // Arrange
-            using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-            {
-                // Setup DB
-                DatabaseUtilities.InitializeDatabase(db);
-                KundeService unitToTest = InitUnitToTest(db);
+            // Act
+            var savedKunde = _kundenService.NewKunde(ApplicationTestFixtures.kunde1Dto());
 
-                // Act
-                var result = unitToTest.GetAll(1, 3, "desc_sort");
-
-                // Assert
-                Assert.NotNull(result);
-                Assert.Equal(3, result.Count);
-                Assert.True(string.Compare(result[0].Nachname, result[1].Nachname) > 0);
-                Assert.True(string.Compare(result[1].Nachname, result[2].Nachname) > 0);
-            }
+            // Assert
+            Assert.NotEqual(0, savedKunde.Id);
+            Assert.NotNull(_kundenService.GetOne(savedKunde.Id));
         }
 
 
 
         [Fact]
-        public void GetAll_PageOutOfBounds_Test()
+        public void UpdateKunde_UpdatesKundeInDatabase_WhenValidEntityProvided()
         {
+
             // Arrange
-            using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-            {
-                // Setup DB
-                DatabaseUtilities.InitializeDatabase(db);
-                KundeService unitToTest = InitUnitToTest(db);
+            var savedKunde = _kundenService.NewKunde(ApplicationTestFixtures.kunde1Dto());
 
-                // Act
-                var result = unitToTest.GetAll(100, 3, "asc_sort");
+            // Act
+            var updatedKunde = _kundenService.UpdateKunde(ApplicationTestFixtures.kunde1UpdateDto());
 
-                // Assert
-                Assert.NotNull(result);
-                Assert.Empty(result);
-            }
+            // Assert
+            Assert.Equal(_kundenService.GetOne(savedKunde.Id).Nachname, ApplicationTestFixtures.kunde1UpdateDto().Nachname);
         }
 
 
 
         [Fact]
-        public void HoleHundAusHeim_Success_Test()
+        public void HoleHaustierAusHeim_RemovesPetFromHome_WhenValidDtoProvided()
         {
             // Arrange
-            using (var db = new TierheimContext(GenerateDbOptions()))
-            {
-                    // Setup DB
-                KundeService unitToTest = InitUnitToTest(db);
-                DatabaseUtilities.InitializeDatabase(db);
+            var newKunde = _kundenService.NewKunde(ApplicationTestFixtures.kunde1Dto());
+            var newTierheim = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto());
 
-                    // Get the first Kunde, Tierheim, and Hund in the database
-                Guid kundenGuid = db.Kunden.First().Guid;
-                string tierheimName = db.Tierheimhaeuser.First().Name;
+            var newHund = _tierheimService.HundInsHeim(ApplicationTestFixtures.hundInsHeimDto(newTierheim.Id));
+            var haustierAusHeimDto = ApplicationTestFixtures.haustierAusHeimDto(newKunde.Id, newTierheim.Id);
 
-                Tierheimhaus tierheim = db.Tierheimhaeuser.First(h => h.Name.Equals(tierheimName));
-                Kunde kunde = db.Kunden.First(k => k.Guid.Equals(kundenGuid));
+            // Act
+            _kundenService.HoleHaustierAusHeim(haustierAusHeimDto);
 
-                    // Add Hund to Tierheim
-                Hund hund = new Hund(Guid.NewGuid(), isBissig: true, "Belfi", Geschlecht.Mann, alter: 5);
-                tierheim.TierInsHeimBringen(hund);
-                db.SaveChanges();
-
-
-                // Act
-                    // Hunde vorher?
-                int initialHundCountInTierheimhaus = db.Tierheimhaeuser.First(h => h.Name.Equals(tierheimName)).TiereZaehlen();
-                int initialHundCountInKunde = db.Kunden.First(k => k.Guid.Equals(kundenGuid)).TiereZaehlen();
-                    // Hole Hund aus heim
-                unitToTest.HoleHundAusHeim(kundenGuid, tierheimName, 5);
-                    // Hunde nacher?
-                int finalHundCountInTierheimhaus = tierheim.TiereZaehlen();
-                int finalHundCountInKunde = kunde.TiereZaehlen();
-
-                // Assert
-                Assert.Equal(initialHundCountInTierheimhaus - 1, finalHundCountInTierheimhaus);
-                Assert.Equal(initialHundCountInKunde + 1, finalHundCountInKunde);
-            }
+            // Assert
+            var kundeBack = _kundenService.GetOne(newKunde.Id);
+            var tierheimBack = _tierheimService.GetOne(newTierheim.Id);
+            Assert.Single(kundeBack.Tiere);
+            Assert.Empty(tierheimBack.Tiere);
         }
 
 
 
+        [Fact]
+        public void AlleTiereZurueckBringen_MovesAllPetsFromCustomerToShelter_WhenValidDtoProvided()
+        {
+            // Arrange
+            var newTierheim = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto());
+            var newKunde = _kundenService.NewKunde(ApplicationTestFixtures.kunde1Dto());
+            var newHund1 = _tierheimService.HundInsHeim(ApplicationTestFixtures.hundInsHeimDto(newTierheim.Id));
+            var newHund2 = _tierheimService.HundInsHeim(ApplicationTestFixtures.hundInsHeimDto(newTierheim.Id));
+
+            _kundenService.HoleHaustierAusHeim(ApplicationTestFixtures.haustierAusHeimDto(newKunde.Id, newTierheim.Id));
+            _kundenService.HoleHaustierAusHeim(ApplicationTestFixtures.haustierAusHeimDto(newKunde.Id, newTierheim.Id));
+
+            // Act
+            _kundenService.AlleTiereZurueckBringen(ApplicationTestFixtures.alleTiereZurueckBringenDto(newKunde.Id, newTierheim.Id));
+
+            // Assert
+            var hund1NachDerAktion = _tierheimService.GetOne(newTierheim.Id);
+            var hund2NachDerAktion = _tierheimService.GetOne(newTierheim.Id);
+            Assert.NotNull(hund1NachDerAktion);
+            Assert.NotNull(hund2NachDerAktion);
+        }
+
+
+
+        [Fact]
+        public void DeleteKunde_RemovesKundeFromDatabase_WhenValidIdProvided()
+        {
+            // Arrange
+            var newKunde = _kundenService.NewKunde(ApplicationTestFixtures.kunde1Dto());
+
+            // Act
+            _kundenService.DeleteKunde(newKunde.Id);
+
+            // Assert
+            Assert.Throws<ArgumentException>(() => _kundenService.GetOne(newKunde.Id));
+        }
+
+
+
+        [Fact]
+        public void DeleteKunde_ThrowsKundeServiceException_WhenInvalidIdProvided()
+        {
+            // Arrange
+            var invalidId = 999;
+
+            // Act and Assert
+            Assert.Throws<KundeServiceException>(() => _kundenService.DeleteKunde(invalidId));
+        }
+
+
+        [Fact]
+        public void GetAll_ReturnsAllCustomersSortedAscendingByName_WhenSortParameterIsAscSort()
+        {
+            // Arrange
+            var newKunde1 = _kundenService.NewKunde(ApplicationTestFixtures.kunde1Dto());
+            var newKunde2 = _kundenService.NewKunde(ApplicationTestFixtures.kunde2Dto());
+
+
+            var currentPage = 1;
+            var itemsPerPage = 10;
+            var sort = "asc_sort";
+
+            // Act
+            var result = _kundenService.GetAll(currentPage, itemsPerPage, sort);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.Equal("Doe", result[0].Nachname);
+            Assert.Equal("Xoe", result[1].Nachname);
+        }
+
+
+
+        [Fact]
+        public void GetAll_ReturnsAllCustomersSortedDescendingByName_WhenSortParameterIsDescSort()
+        {
+            // Arrange
+            var newKunde1 = _kundenService.NewKunde(ApplicationTestFixtures.kunde1Dto());
+            var newKunde2 = _kundenService.NewKunde(ApplicationTestFixtures.kunde2Dto());
+
+            var currentPage = 1;
+            var itemsPerPage = 10;
+            var sort = "desc_sort";
+
+            // Act
+            var result = _kundenService.GetAll(currentPage, itemsPerPage, sort);
+
+            // Assert
+            Assert.Equal(2, result.Count);
+            Assert.Equal("Xoe", result[0].Nachname);
+            Assert.Equal("Doe", result[1].Nachname);
+        }
+        
     }
 }
-

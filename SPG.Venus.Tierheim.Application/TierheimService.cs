@@ -26,6 +26,21 @@ public class TierheimService
 
     // GET ALL -----------------------------------------------------------------
 
+    public Tierheimhaus GetOne(int id)
+    {
+        return _tierheimValidationService.getTierheimById(id);
+    }
+
+
+
+
+    public List<Tierheimhaus> GetAll()
+    {
+        return _tierheimRepository.GetAll().ToList();
+    }
+
+
+
     public List<Tierheimhaus> GetAll(int currentPage, int itemsPerPage, string sort = "asc_sort")
     {
         // Sort Tierheime
@@ -44,7 +59,7 @@ public class TierheimService
 
     // CREATE TIERHEIM ---------------------------------------------------------
 
-    public void NewTierheim(NewTierheimDto dto)
+    public Tierheimhaus NewTierheim(NewTierheimDto dto)
     {
         try
         {
@@ -54,6 +69,8 @@ public class TierheimService
 
             // -> TierheimRepositoryEx
             _tierheimRepository.Create(newTierheim);
+
+            return newTierheim;
         }
         catch(ArgumentException ex)
         {
@@ -72,7 +89,7 @@ public class TierheimService
 
     // HUND INS HEIM -----------------------------------------------------------
 
-    public void HundInsHeim(HundInsHeimDto dto)
+    public Hund HundInsHeim(HundInsHeimDto dto)
     {
 
         try
@@ -86,6 +103,8 @@ public class TierheimService
 
             // -> TierheimRepositoryEx
             _tierheimRepository.Update(tierheim);
+
+            return hund;
 
         }
         catch (ArgumentException ex)
@@ -105,7 +124,7 @@ public class TierheimService
 
     // KATZE INS HEIM -----------------------------------------------------------
 
-    public void KatzeInsHeim(KatzeInsHeimDto dto)
+    public Katze KatzeInsHeim(KatzeInsHeimDto dto)
     {
         try
         {
@@ -118,6 +137,8 @@ public class TierheimService
 
             // -> TierheimRepositoryEx
             _tierheimRepository.Update(tierheim);
+
+            return katze;
 
         }
         catch (ArgumentException ex)
