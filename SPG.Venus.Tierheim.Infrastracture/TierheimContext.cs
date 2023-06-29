@@ -8,7 +8,6 @@ namespace SPG.Venus.Tierheim.Infrastructure
 {
     public class TierheimContext : DbContext
     {
-        public DbSet<Addresse> Adressen => Set<Addresse>();
         public DbSet<Haustier> Haustiere => Set<Haustier>();
         public DbSet<Hund> Hunde => Set<Hund>();
         public DbSet<Katze> Katzen => Set<Katze>();
@@ -29,17 +28,11 @@ namespace SPG.Venus.Tierheim.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Tierheimhaus>().HasKey(h => h.Name);
+            // modelBuilder.Entity<Tierheimhaus>().HasKey(h => h.Name);
 
             // Value Objects
             modelBuilder.Entity<Kunde>().OwnsOne(k => k.Adresse);
             modelBuilder.Entity<Tierheimhaus>().OwnsOne(th => th.Adresse);
-
-            // Table-Per-Hierarchy
-            //modelBuilder.Entity<Haustier>()
-            //    .HasDiscriminator<string>("HaustierType")
-            //    .HasValue<Hund>("Hund")
-            //    .HasValue<Katze>("Katze");
         }
 
 
@@ -48,7 +41,8 @@ namespace SPG.Venus.Tierheim.Infrastructure
             Randomizer.Seed = new Random(181025);
 
 
-            // Seeder für Haustier (Katze and Hund) ----------------------------
+
+            // Seeder for Haustier (Katze and Hund) ----------------------------
 
             List<Haustier> haustiere = new Faker<Haustier>()
                 .CustomInstantiator(f =>
@@ -71,21 +65,17 @@ namespace SPG.Venus.Tierheim.Infrastructure
                 })
                 .Generate(100);
 
-            Haustiere.AddRange(haustiere);
+            //Haustiere.AddRange(haustiere);
             SaveChanges();
-
-
-            //output.WriteLine("1- haustiere ------------------");
-            //output.WriteLine(haustiere.ToString());
-
 
 
 
             // Seeder for Kunden -----------------------------------------------
 
-            
-            List<Kunde> kunden = new Faker<Kunde>("de")
-                .CustomInstantiator(f => new Kunde(
+            var kunden = new Faker<Kunde>("de")
+            .CustomInstantiator(f =>
+            {
+                var kunde = new Kunde(
                     f.Random.Guid(),
                     f.Name.FirstName(),
                     f.Name.LastName(),
@@ -95,83 +85,76 @@ namespace SPG.Venus.Tierheim.Infrastructure
                         f.Address.City(),
                         f.Address.Country()),
                     f.PickRandom<Geschlecht>()
-                ))
-                .RuleFor(c => c.Tiere, f => f.Random.ListItems(haustiere, f.Random.Int(1, 3)).ToList())
-                .Generate(50);
+                );
 
-            Kunden.AddRange(kunden);
-            SaveChanges();
+                var haustiereL = f.Random.ListItems(haustiere, f.Random.Int(5, 10)).ToList();
+
+                foreach (var haustier in haustiere)
+                {
+                    kunde.AddHaustier(haustier);
+
+                    Haustiere.Add(haustier); // Add Haustier to the context
+                }
+
+                Kunden.Add(kunde); // Add Kunde to the context
+
+                return kunde;
+            })
+            .Generate(50);
+
+            SaveChanges(); // Save changes to both Kunden and Haustiere
 
 
-            //output.WriteLine("2- Kunden ------------------");
-            //output.WriteLine(kunden.ToString());
 
 
 
-
-            // Seeder für Tierheimhäuser ---------------------------------------
-
+            // Seeder for Tierheimhaus
             List<Tierheimhaus> tierheimhauser = new Faker<Tierheimhaus>("de")
                 .CustomInstantiator(f => new Tierheimhaus(
                     f.Random.Guid(),
-                    f.Person.Company.Name,
+                    f.Company.CompanyName(),
                     new Addresse(
-                    f.Address.StreetName(),
-                    f.Address.BuildingNumber(),
-                    f.Address.City(),
-                    f.Address.Country()),
-                f.Date.Between(DateTime.Now.AddHours(-8), DateTime.Now.AddHours(-1)),
-                f.Date.Between(DateTime.Now.AddHours(1), DateTime.Now.AddHours(8))
-            ))
-            .RuleFor(t => t.Tiere, f => f.Random.ListItems(haustiere, f.Random.Int(5, 10)).ToList())
-            .Generate(10);
+                        f.Address.StreetName(),
+                        f.Address.BuildingNumber(),
+                        f.Address.City(),
+                        f.Address.Country()),
+                    TimeSpan.FromHours(f.Random.Int(1, 8)),
+                    TimeSpan.FromHours(f.Random.Int(9, 17))
+                ))
+                //.RuleFor(t => t.Tiere, f => f.Random.ListItems(haustiere, f.Random.Int(5, 10)).ToList())
+                .Generate(50);
 
             Tierheimhaeuser.AddRange(tierheimhauser);
             SaveChanges();
 
 
-            //output.WriteLine("3- Tierheimhäuser ------------------");
-            //output.WriteLine(tierheimhauser.ToString());
-
-
-
-
-            // Seeder für Personal ---------------------------------------------
-
+            int i = 0;
             List<Personal> personal = new Faker<Personal>("de")
-                .CustomInstantiator(f => new Personal(
-                    f.Random.Guid(),
-                    f.Name.FirstName(),
-                    f.Name.LastName(),
-                    f.PickRandom<Geschlecht>(),
-                    f.Random.AlphaNumeric(10),
-                    f.Random.ListItem(tierheimhauser)
-                ))
+                .CustomInstantiator(f => {
+                    var tierheim = tierheimhauser[i++];
+                    var newPersonal = new Personal(
+                        f.Random.Guid(),
+                        f.Name.FirstName(),
+                        f.Name.LastName(),
+                        f.PickRandom<Geschlecht>(),
+                        f.Random.AlphaNumeric(10)
+                    );
+                    tierheim.PersonalAnstellen(newPersonal);
+                    return newPersonal;
+                })
                 .Generate(50);
 
             Personal.AddRange(personal);
             SaveChanges();
 
 
-            //output.WriteLine("4- Personal ------------------");
-            //output.WriteLine(personal.ToString());
 
-
-
-
-            // Seeder for Tierheimhaus -----------------------------------------
-
-            tierheimhauser.ForEach(tierheim =>
-            {
-                var zugewiesenesPersonal = personal.Where(p => p.TierheimhausNavigationId == tierheim.Id).ToList();
-                tierheim.PersonalAnstellen(zugewiesenesPersonal);
-            });
-
-
-            SaveChanges();
-            //output.WriteLine("5- ALLES OKAY ------------------");
 
         }
+
+
+
+
     }
 }
 

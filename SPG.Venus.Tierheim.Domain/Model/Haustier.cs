@@ -24,7 +24,6 @@ namespace SPG.Venus.Tierheim.Domain.Model
 
         // CTOR ----------------------------------------------------------------
 
-        // Entity Framework
         protected Haustier() { }
 
         public Haustier(Guid guid, string name, Geschlecht geschlecht, int alter)

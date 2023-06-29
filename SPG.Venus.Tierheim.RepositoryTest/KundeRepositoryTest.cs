@@ -1,111 +1,162 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using SPG.Venus.Tierheim.Domain.Exceptions;
-using SPG.Venus.Tierheim.Domain.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using SPG.Venus.Tierheim.Domain.Model;
-using SPG.Venus.Tierheim.Infrastructure;
 using SPG.Venus.Tierheim.Repository;
-using SPG.Venus.Tierheim.Repository.Tierheim;
-using SPG.Venus.Tierheim.RepositoryTest.Helpers;
-using System;
-using System.Security.Cryptography;
-using Xunit.Abstractions;
+using SPG.Venus.Tierheim.Infrastructure;
+using Xunit;
+using SPG.Venus.Tierheim.Domain.Exceptions;
+using System.Text;
+using System.Linq;
 
-namespace SPG.Venus.Tierheim.RepositoryTest
+namespace SPG.Venus.Tierheim.Test.Repository
 {
-    public class TierheimRepositoryTest
+    public class KundeRepositoryTest
     {
-        private readonly Mock<TierheimContext> _db = new Mock<TierheimContext>();
-        private readonly IReadOnlyRepositoryBase<Tierheimhaus> _unitToTest;
 
-        private readonly ITestOutputHelper output;
-
-
-        public TierheimRepositoryTest(ITestOutputHelper output)
+        private TierheimContext GenerateDb()
         {
-            IReadOnlyRepositoryBase<Tierheimhaus> _unitToTest = new RepositoryBase<Tierheimhaus>(_db.Object);
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
+            optionsBuilder.UseSqlite("Data Source=Tierheim_Test.db");
 
-            this.output = output;
-        }
-
-
-        // SUCESS TEST
-        [Fact]
-        public void Create_Success_Test()
-        {
-            // Arrange (Enty, DB)
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
-            {
-                DatabaseUtilities.InitializeDatabase(db);
-
-                Addresse adresse = new Addresse("andere strasse", "10", "linz", "oesterreich");
-                Kunde kunde = new Kunde(Guid.NewGuid(), "Venus", "Harajchi", adresse, Geschlecht.Frau);
-
-                var kundeRepository = new KundeRepository(db);
-                var actual = kundeRepository.GetAll().Count();
-
-                // Act
-                new KundeRepository(db).Create(kunde);
-
-                // Assert
-                var expected = kundeRepository.GetAll().Count();
-                Assert.Equal(actual+1, expected);
-            }
-        }
-
-
-        // FAILED TEST
-        [Fact]
-        public void Create_KundeRepositoryCreateException_Test()
-        {
-            // Arrange (Enty, DB)
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
-            {
-                DatabaseUtilities.InitializeDatabase(db);
-
-                Kunde kunde = new Kunde(Guid.NewGuid(), "Venus", "Harajchi", null, Geschlecht.Frau);
-
-                // Act & Assert
-                Assert.Throws<RepositoryException>(() => new KundeRepository(db).Create(kunde));
-            }
+            TierheimContext db = new TierheimContext(optionsBuilder.Options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.Seed();
+            return db;
         }
 
 
 
-
-        // SUCESS TEST
         [Fact]
-        public void Haustier_GetByGuid_Success_Test()
+        public void GetById_ReturnsKundeById()
         {
             // Arrange
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
+            using (var context = GenerateDb())
             {
-                DatabaseUtilities.InitializeDatabase(db);
-
-                    // Haustier
-                Guid haustierGuid = Guid.NewGuid();
-                Katze katze = new Katze(haustierGuid, isAnschmiegsam: true, "Dora", Geschlecht.Frau, alter: 1);
-
-                    // Heim
-                Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-                Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
-
-                    // Kunde
-                Addresse adresse2 = new Addresse("andere strasse", "10", "linz", "oesterreich");
-                Kunde kunde = new Kunde(Guid.NewGuid(), "Venus", "Harajchi", adresse2, Geschlecht.Frau);
-
-                haus.TierInsHeimBringen(katze);
-                kunde.HoleHundAusHeim(haus, 10);
-                new KundeRepository(db).Create(kunde);
+                var repository = new KundeRepository(context);
 
                 // Act
-                Haustier actual = new RepositoryBase<Haustier>(db).GetByGuid<Haustier>(haustierGuid)!;
+                Kunde? kundeBack = repository.GetById(1).SingleOrDefault();
 
                 // Assert
-                Assert.Equal(haustierGuid, actual.Guid);
+                Assert.NotNull(kundeBack);
             }
         }
 
+
+
+        [Fact]
+        public void GetById_ReturnsNull_WhenKundeDoesNotExist()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var kundenId = -1;
+                var repository = new KundeRepository(context);
+
+                // Act
+                var result = repository.GetById(kundenId).SingleOrDefault();
+
+                // Assert
+                Assert.Null(result);
+            }
+        }
+
+
+
+        [Fact]
+        public void Create_AddsNewKundeToDatabase_WhenValidEntityProvided()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var repository = new KundeRepository(context);
+
+                var newKunde = new Kunde(Guid.NewGuid(), "John", "Doe",
+                    new Addresse("Teststraße", "456", "Teststadt", "Testland"), Geschlecht.Mann);
+
+                // Act
+                repository.Create(newKunde);
+
+                // Assert
+                Assert.NotEqual(0, newKunde.Id);
+            }
+        }
+
+
+
+        [Fact]
+        public void Create_ThrowsRepositoryException_WhenDbUpdateExceptionOccurs()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var repository = new KundeRepository(context);
+
+                var newKunde = new Kunde(Guid.NewGuid(), "John", "Doe",
+                    new Addresse("Teststraße", "456", "Teststadt", "Testland"), Geschlecht.Mann);
+
+                repository.Create(newKunde);
+
+                // Act & Assert
+                Assert.Throws<KundeRepositoryException>(() => repository.Create(newKunde));
+            }
+        }
+
+
+
+        [Fact]
+        public void Update_UpdatesExistingKundeInDatabase_WhenValidEntityProvided()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var repository = new KundeRepository(context);
+                var existingKunde = repository.GetById(1).Single();
+
+                // Act
+                existingKunde.Nachname = "Suwarti";
+                repository.Update(existingKunde);
+
+                // Assert
+                Assert.Equal(existingKunde.Nachname, repository.GetById(1).Single().Nachname);
+            }
+        }
+
+
+
+        [Fact]
+        public void Delete_RemovesKundeFromDatabase_WhenKundeExists()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var kundeId = 1;
+                var repository = new KundeRepository(context);
+
+                // Act
+                repository.Delete(kundeId);
+
+                // Assert
+                Assert.Null(repository.GetById(kundeId).SingleOrDefault());
+            }
+        }
+
+
+
+        [Fact]
+        public void Delete_ThrowsKundeRepositoryException_WhenKundeDoesNotExist()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var kundeId = -1;
+                var repository = new KundeRepository(context);
+
+                // Act & Assert
+                Assert.Throws<KundeRepositoryException>(() => repository.Delete(kundeId));
+            }
+        }
+        
     }
 }
+

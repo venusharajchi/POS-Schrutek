@@ -1,8 +1,8 @@
 ﻿using System;
 namespace SPG.Venus.Tierheim.Domain.Exceptions
 {
-    public class ServiceException : Exception
-    {
+	public class ServiceException : Exception
+	{
         public ServiceException()
             : base()
         { }

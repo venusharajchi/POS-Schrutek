@@ -1,32 +1,26 @@
-﻿<Properties StartupConfiguration="{5646C08C-36CE-41C1-A327-59BE40A4A9D9}|Default">
-  <MonoDevelop.Ide.ItemProperties.SPG.Venus.Tierheim.ApplicationTest FirstBuild="True" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="SPG.Venus.Tierheim.Domain/Dtos/NewTierheimDto.cs">
+﻿<Properties StartupConfiguration="{5646C08C-36CE-41C1-A327-59BE40A4A9D9}|Unit Tests">
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.ItemProperties.SPG.Venus.Tierheim.Domain.Test PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workbench ActiveDocument="SPG.Venus.Tierheim.Domain.Test/TierheimhausTest.cs">
     <Files>
-      <File FileName="SPG.Venus.Tierheim.Infrastracture/TierheimContext.cs" Line="32" Column="69" IsPinned="True" />
-      <File FileName="SPG.Venus.Tierheim.Domain.Test/TierheimTest.cs" Line="214" Column="19" IsPinned="True" />
-      <File FileName="SPG.Venus.Tierheim.Repository/Class1.cs" Line="121" Column="68" />
-      <File FileName="SPG.Venus.Tierheim.Domain/IRepositoryBase.cs" Line="8" Column="47" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Interfaces/IReadOnlyRepositoryBase.cs" Line="11" Column="22" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Interfaces/IFindableByGuid.cs" Line="9" Column="37" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Interfaces/IFindableByEmail.cs" Line="7" Column="6" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Exceptions/RepositoryException.cs" Line="4" Column="1" />
-      <File FileName="SPG.Venus.Tierheim.RepositoryTest/UnitTest1.cs" Line="144" Column="51" />
-      <File FileName="SPG.Venus.Tierheim.RepositoryTest/Helpers/DatabaseUtilities.cs" Line="33" Column="10" />
-      <File FileName="SPG.Venus.Tierheim.Repository/Tierheim/TierheimRepository.cs" Line="39" Column="44" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Interfaces/IReadOnlyTierheimRepository.cs" Line="9" Column="20" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Model/Tierheimhaus.cs" Line="24" Column="42" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Model/Personal.cs" Line="9" Column="80" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Model/Kunde.cs" Line="52" Column="21" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Interfaces/ITierheimRepository.cs" Line="9" Column="21" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Model/Adresse.cs" Line="12" Column="49" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Model/Haustier.cs" Line="11" Column="47" />
-      <File FileName="SPG.Venus.Tierheim.Repository/Kunde/KundeRepository.cs" Line="19" Column="21" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Model/Katze.cs" Line="1" Column="1" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Interfaces/IReadOnlyKundenRepository.cs" Line="9" Column="36" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Interfaces/IKundenRepository.cs" Line="7" Column="19" />
-      <File FileName="SPG.Venus.Tierheim.RepositoryTest/KundeRepositoryTest.cs" Line="94" Column="21" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Dtos/CreateTierheimDto.cs" Line="8" Column="55" />
-      <File FileName="SPG.Venus.Tierheim.Domain/Exceptions/ServiceException.cs" Line="6" Column="34" />
+      <File FileName="SPG.Venus.Tierheim.Application/TierheimService.cs" Line="44" Column="33" />
+      <File FileName="SPG.Venus.Tierheim.Domain/Dtos/NewTierheimDto.cs" Line="15" Column="24" />
+      <File FileName="SPG.Venus.Tierheim.Domain/Exceptions/TierheimServiceException.cs" Line="4" Column="51" />
+      <File FileName="SPG.Venus.Tierheim.Domain/Exceptions/ServiceException.cs" Line="7" Column="21" />
+      <File FileName="SPG.Venus.Tierheim.RepositoryTest/TierheimRepositoryTest.cs" Line="155" Column="11" />
+      <File FileName="SPG.Venus.Tierheim.RepositoryTest/KundeRepositoryTest.cs" Line="109" Column="11" />
+      <File FileName="SPG.Venus.Tierheim.ApplicationTest/TierheimServiceTest.cs" Line="326" Column="7" />
+      <File FileName="SPG.Venus.Tierheim.Application/KundeService.cs" Line="1" Column="1" />
+      <File FileName="SPG.Venus.Tierheim.Domain.Test/TierheimhausTest.cs" Line="270" Column="1" />
+      <File FileName="SPG.Venus.Tierheim.Domain/Model/Tierheimhaus.cs" Line="135" Column="37" />
+      <File FileName="SPG.Venus.Tierheim.Infrastracture/TierheimContext.cs" Line="113" Column="1" />
+      <File FileName="SPG.Venus.Tierheim.Domain/Model/Personal.cs" Line="40" Column="41" />
+      <File FileName="SPG.Venus.Tierheim.Domain/Model/Kunde.cs" Line="36" Column="33" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -37,6 +31,10 @@
               <Node name="Exceptions" expanded="True" />
               <Node name="Model" expanded="True" />
             </Node>
+            <Node name="SPG.Venus.Tierheim.Domain.Test" expanded="True">
+              <Node name="TierheimhausTest.cs" selected="True" />
+            </Node>
+            <Node name="SPG.Venus.Tierheim.Repository" expanded="True" />
           </Node>
         </State>
       </Pad>
@@ -47,12 +45,4 @@
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.SPG.Venus.Tierheim.Application FirstBuild="True" />
-  <MonoDevelop.Ide.ItemProperties.SPG.Venus.Tierheim.Domain.Test PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
-  <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
-  </MonoDevelop.Ide.DebuggingService.Breakpoints>
-  <MultiItemStartupConfigurations />
 </Properties>

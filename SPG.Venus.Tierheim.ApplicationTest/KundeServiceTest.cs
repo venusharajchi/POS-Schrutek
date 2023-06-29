@@ -8,7 +8,6 @@ using SPG.Venus.Tierheim.Domain.Interfaces;
 using SPG.Venus.Tierheim.Domain.Model;
 using SPG.Venus.Tierheim.Infrastructure;
 using SPG.Venus.Tierheim.Repository;
-using SPG.Venus.Tierheim.Repository.Tierheim;
 using SPG.Venus.Tierheim.RepositoryTest.Helpers;
 
 namespace SPG.Venus.Tierheim.ApplicationTest

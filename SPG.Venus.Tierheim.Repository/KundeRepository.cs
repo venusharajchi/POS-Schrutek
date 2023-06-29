@@ -11,52 +11,92 @@ namespace SPG.Venus.Tierheim.Repository
     {
         private readonly TierheimContext _db;
 
+
         public KundeRepository(TierheimContext db)
         {
             _db = db;
         }
 
 
-        public void Create(Kunde newEntity)
+        public DbContext GetContext()
         {
-            try
-            {
-                DbSet<Kunde> dbSet = _db.Set<Kunde>();
-                dbSet.Add(newEntity);
-                _db.SaveChanges();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new RepositoryException("Create nicht möglich!", ex);
-            }
-        }
-
-
-        public void Update(Kunde entity)
-        {
-            try
-            {
-                Kunde? existingEntity = _db.Set<Kunde>().First(k => k.Guid.Equals(entity.Guid));
-
-                if (existingEntity == null)
-                    throw new RepositoryException($"Tierheimhaus with id {entity.Guid} not found!");
-
-                // If the entity exists in the database, update its properties.
-                _db.Entry(existingEntity).CurrentValues.SetValues(entity);
-                _db.SaveChanges();
-
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new RepositoryException("Update nicht möglich!", ex);
-            }
+            return _db;
         }
 
 
         public IQueryable<Kunde> GetAll()
         {
-            return _db.Set<Kunde>();
+
+            
+
+            return _db.Kunden.Include(k => k.Tiere);
+
+
         }
+
+
+        public IQueryable<Kunde> GetById(int id)
+        {
+            return _db.Kunden.Include(k => k.Tiere).Where(k => k.Id == id);
+        }
+
+
+
+        public IQueryable<Kunde> GetByGuid(Guid guid)
+        {
+            return _db.Set<Kunde>().Where(k => k.Guid == guid).Include(k => k.Tiere);
+        }
+
+
+
+        public void Create(Kunde newEntity)
+        {
+            DbSet<Kunde> dbSet = _db.Set<Kunde>();
+            dbSet.Add(newEntity);
+
+            try
+            {
+                _db.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new KundeRepositoryException("Save not possible!", ex);
+            }
+        }
+
+
+
+        public void Update(Kunde entity)
+        {
+            DbSet<Kunde> dbSet = _db.Set<Kunde>();
+            dbSet.Update(entity);
+
+            try
+            {
+                _db.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new KundeRepositoryException("Update not possible!", ex);
+            }
+        }
+
+
+
+        public void Delete(int id)
+        {
+            Kunde? entity = GetById(id).SingleOrDefault();
+            if (entity != null)
+            {
+                DbSet<Kunde> dbSet = _db.Set<Kunde>();
+                dbSet.Remove((Kunde)entity);
+                _db.SaveChanges();
+            }
+            else
+            {
+                throw new KundeRepositoryException($"Kunde with ID {id} not found!");
+            }
+        }
+
     }
 }
-

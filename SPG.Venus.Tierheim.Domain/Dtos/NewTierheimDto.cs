@@ -11,8 +11,8 @@ namespace SPG.Venus.Tierheim.Domain.Dtos
         public string Number { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public TimeSpan StartDate { get; set; }
+        public TimeSpan EndDate { get; set; }
     }
 }
 

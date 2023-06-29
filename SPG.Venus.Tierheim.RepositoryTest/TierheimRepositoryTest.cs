@@ -1,156 +1,146 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using Moq;
-using SPG.Venus.Tierheim.Domain.Exceptions;
-using SPG.Venus.Tierheim.Domain.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using SPG.Venus.Tierheim.Domain.Model;
-using SPG.Venus.Tierheim.Infrastructure;
 using SPG.Venus.Tierheim.Repository;
-using SPG.Venus.Tierheim.Repository.Tierheim;
-using SPG.Venus.Tierheim.RepositoryTest.Helpers;
-using System;
-using System.Security.Cryptography;
-using Xunit.Abstractions;
+using SPG.Venus.Tierheim.Infrastructure;
+using Xunit;
+using SPG.Venus.Tierheim.Domain.Exceptions;
+using System.Text;
+using System.Linq;
 
-namespace SPG.Venus.Tierheim.RepositoryTest
+namespace SPG.Venus.Tierheim.Test.Repository
 {
-    public class KundeRepositoryTest
+    public class TierheimRepositoryTest
     {
-        private readonly Mock<TierheimContext> _db = new Mock<TierheimContext>();
-        private readonly IReadOnlyRepositoryBase<Kunde> _unitToTest;
-
-        private readonly ITestOutputHelper output;
-
-
-        public KundeRepositoryTest(ITestOutputHelper output)
+        private TierheimContext GenerateDb()
         {
-            IReadOnlyRepositoryBase<Kunde> _unitToTest = new RepositoryBase<Kunde>(_db.Object);
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
+            optionsBuilder.UseSqlite("Data Source=Tierheim_Test.db");
 
-            this.output = output;
+            TierheimContext db = new TierheimContext(optionsBuilder.Options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            db.Seed();
+            return db;
         }
 
 
-        // SUCESS TEST
+
         [Fact]
-        public void Create_Success_Test()
+        public void GetById_ReturnsTierheimById()
         {
-            // Arrange (Enty, DB)
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
+            // Arrange
+            using (var context = GenerateDb())
             {
-                DatabaseUtilities.InitializeDatabase(db);
-
-                Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-                Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
-
-                var tierheimRepository = new TierheimRepository(db);
-                var actual = tierheimRepository.GetAll().Count();
+                var tierheimId = 1;
+                var repository = new TierheimRepository(context);
 
                 // Act
-                tierheimRepository.Create(haus);
+                Tierheimhaus? tierheimBack = repository.GetById(tierheimId).SingleOrDefault();
 
                 // Assert
-                var expected = tierheimRepository.GetAll().Count();
-                Assert.Equal(actual+1, expected);
+                Assert.NotNull(tierheimBack);
             }
         }
 
 
-        // FAILED TEST
+
         [Fact]
-        public void Create_TierheimRepositoryCreateException_Test()
+        public void GetById_ReturnsNull_WhenTierheimDoesNotExist()
         {
-            // Arrange (Entity, DB)
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
+            // Arrange
+            using (var context = GenerateDb())
             {
-                DatabaseUtilities.InitializeDatabase(db);
-                
-                Tierheimhaus haus1 = new Tierheimhaus(Guid.NewGuid(), "Heim666", null, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
+                var tierheimId = -1;
+                var repository = new TierheimRepository(context);
+
+                // Act
+                var result = repository.GetById(tierheimId).SingleOrDefault();
+
+                // Assert
+                Assert.Null(result);
+            }
+        }
+
+
+
+        [Fact]
+        public void Create_AddsNewTierheimToDatabase_WhenValidEntityProvided()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var repository = new TierheimRepository(context);
+
+                Tierheimhaus newTierheim = new Tierheimhaus(Guid.NewGuid(),
+                    "Test Tierheim", new Addresse("Musterstraße", "123", "Musterstadt", "Musterland"),
+                    TimeSpan.FromHours(8), TimeSpan.FromHours(17));
+
+                // Act
+                repository.Create(newTierheim);
+
+                // Assert
+                Assert.NotEqual(0, newTierheim.Id);
+            }
+        }
+
+
+
+        [Fact]
+        public void Create_ThrowsRepositoryException_WhenDbUpdateExceptionOccurs()
+        {
+            // Arrange
+            using (var context = GenerateDb())
+            {
+                var repository = new TierheimRepository(context);
+
+                Tierheimhaus newTierheim = new Tierheimhaus(Guid.NewGuid(),
+                    "Test Tierheim", new Addresse("Musterstraße", "123", "Musterstadt", "Musterland"),
+                    TimeSpan.FromHours(8), TimeSpan.FromHours(17));
+
+                // Act
+                repository.Create(newTierheim);
 
                 // Act & Assert
-                Assert.Throws<RepositoryException>(() => new TierheimRepository(db).Create(haus1));
+                Assert.Throws<TierheimRepositoryException>(() => repository.Create(newTierheim));
             }
         }
 
 
 
-        // SUCESS TEST
         [Fact]
-        public void Tierheimhaus_GetByPK_Success_Test()
+        public void Delete_RemovesTierheimFromDatabase_WhenTierheimExists()
         {
             // Arrange
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
+            using (var context = GenerateDb())
             {
-                DatabaseUtilities.InitializeDatabase(db);
-
-                Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-                Tierheimhaus expected = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
-                new TierheimRepository(db).Create(expected);
+                var tierheimId = 1;
+                var repository = new TierheimRepository(context);
 
                 // Act
-                Tierheimhaus actual = new RepositoryBase<Tierheimhaus>(db).GetByPK<string, Personal>("Heim666")!;
+                repository.Delete(tierheimId);
 
                 // Assert
-                Assert.Equal(expected.Name, actual.Name);
+                Assert.Null(repository.GetById(tierheimId).SingleOrDefault());
             }
         }
 
 
 
-        // SUCESS TEST
         [Fact]
-        public void Personal_GetByGuid_Success_Test()
+        public void Delete_ThrowsTierheimRepositoryException_WhenTierheimDoesNotExist()
         {
             // Arrange
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
+            using (var context = GenerateDb())
             {
-                DatabaseUtilities.InitializeDatabase(db);
+                var tierheimId = -1;
+                var repository = new TierheimRepository(context);
 
-
-                Guid personalGuid = Guid.NewGuid();
-
-                Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-                Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
-                Personal expected = new Personal(personalGuid, "susi", "polter", Geschlecht.Frau, "1234567890", haus);
-
-                haus.PersonalAnstellen(expected);
-                new TierheimRepository(db).Create(haus);
-
-                // Act
-                Personal actual = new RepositoryBase<Personal>(db).GetByGuid<Personal>(personalGuid)!;
-
-                // Assert
-                Assert.Equal(personalGuid, actual.Guid);
+                // Act & Assert
+                Assert.Throws<TierheimRepositoryException>(() => repository.Delete(tierheimId));
             }
         }
-
-
-
-        // SUCESS TEST
-        [Fact]
-        public void Haustier_GetByGuid_Success_Test()
-        {
-            // Arrange
-            using (TierheimContext db = new TierheimContext(DatabaseUtilities.GenerateDbOptions()))
-            {
-                DatabaseUtilities.InitializeDatabase(db);
-
-
-                Guid haustierGuid = Guid.NewGuid();
-
-                Addresse adresse1 = new Addresse("eine strasse", "33", "wien", "oesterreich");
-                Tierheimhaus haus = new Tierheimhaus(Guid.NewGuid(), "Heim666", adresse1, DateTime.Now, DateTime.Now.Add(TimeSpan.FromHours(10)));
-                Katze expected = new Katze(haustierGuid, isAnschmiegsam: true, "Dora", Geschlecht.Frau, alter: 1);
-
-                haus.TierInsHeimBringen(expected);
-                new TierheimRepository(db).Create(haus);
-
-                // Act
-                Haustier actual = new RepositoryBase<Haustier>(db).GetByGuid<Haustier>(haustierGuid)!;
-
-                // Assert
-                Assert.Equal(haustierGuid, actual.Guid);
-            }
-        }
-
     }
 }
+
+
+
