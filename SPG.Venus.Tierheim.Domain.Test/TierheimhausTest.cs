@@ -8,7 +8,7 @@ namespace SPG.Venus.Tierheim.Domain.Test;
 
 public class TierheimTest
 {
-    
+
     private TierheimContext GenerateDb()
     {
         DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
