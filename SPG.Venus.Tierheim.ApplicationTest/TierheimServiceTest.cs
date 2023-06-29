@@ -1,331 +1,182 @@
-﻿
-/*
-
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using SPG.Venus.Tierheim.Application;
+﻿using Microsoft.EntityFrameworkCore;
 using SPG.Venus.Tierheim.Domain.Dtos;
 using SPG.Venus.Tierheim.Domain.Exceptions;
 using SPG.Venus.Tierheim.Domain.Model;
-using SPG.Venus.Tierheim.Infrastructure;
 using SPG.Venus.Tierheim.Repository;
-using SPG.Venus.Tierheim.RepositoryTest.Helpers;
+using SPG.Venus.Tierheim.Infrastructure;
+using Xunit;
+using System;
+using System.Linq;
+using SPG.Venus.Tierheim.Application;
+using SPG.Venus.Tierheim.Domain.Interfaces;
 
-namespace SPG.Venus.Tierheim.ApplicationTest;
-
-public class TierheimServiceTest
+namespace SPG.Venus.Tierheim.Test.Application
 {
-    private TierheimService InitUnitToTest(TierheimContext db)
+    public class TierheimServiceTest : IDisposable
     {
-        return new TierheimService
-        (
-            new TierheimRepository(db),
-            new RepositoryBase<Tierheimhaus>(db)
-        );
-    }
+        private readonly TierheimService _tierheimService;
+        private readonly TierheimContext _context;
 
-
-    private DbContextOptions GenerateDbOptions()
-    {
-        SqliteConnection connection = new SqliteConnection("Data Source = :memory:");
-        connection.Open();
-
-        DbContextOptionsBuilder options = new DbContextOptionsBuilder();
-        options.UseSqlite(connection);
-        return options.Options;
-    }
-
-    /*
-    [Fact]
-    public void NewTierheim_Success_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
+        public TierheimServiceTest()
         {
-            // Setup DB
-            TierheimService unitToTest = InitUnitToTest(db);
-            DatabaseUtilities.InitializeDatabase(db);
+            _context = GenerateDb();
+            var tierheimRepository = new TierheimRepository(_context);
+            var tierheimValidationService = new TierheimValidationService(tierheimRepository);
 
-            // Setup Dto
-            NewTierheimDto entity = new NewTierheimDto()
-            {
-                Name = "Test Tierheim",
-                StartDate = DateTime.Now.AddDays(-10),
-                EndDate = DateTime.Now.AddDays(10),
-                Street = "Test Street",
-                Number = "123",
-                City = "Test City",
-                Country = "Test Country"
-            };
+            _tierheimService = new TierheimService(tierheimRepository, tierheimValidationService);
+        }
+
+
+        public TierheimContext GenerateDb()
+        {
+            DbContextOptionsBuilder optionsBuilder = new DbContextOptionsBuilder();
+            optionsBuilder.UseSqlite("Data Source=Tierheim_Test.db");
+
+            TierheimContext db = new TierheimContext(optionsBuilder.Options);
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+            return db;
+        }
+
+
+
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+
+
+
+        [Fact]
+        public void NewTierheim_CreatesNewTierheim_WhenValidDtoProvided()
+        {
+            // Act
+            var newTierheim = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto());
+
+            // Assert
+            Assert.NotNull(newTierheim);
+            Assert.Equal(ApplicationTestFixtures.tierheimDto().Name, newTierheim.Name);
+        }
+
+
+
+        [Fact]
+        public void HundInsHeim_AddsDogToShelter_WhenValidDtoProvided()
+        {
+            // Arrange
+            var newTierheim = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto());
 
             // Act
-            unitToTest.NewTierheim(entity);
+            var newHund = _tierheimService.HundInsHeim(ApplicationTestFixtures.hundInsHeimDto(newTierheim.Id));
 
             // Assert
-            var createdTierheim = db.Tierheimhaeuser.FirstOrDefault(t => t.Name == "Test Tierheim");
-            Assert.NotNull(createdTierheim);
-            Assert.Equal("Test Tierheim", createdTierheim.Name);
-            Assert.Equal("Test Street", createdTierheim.Adresse.Strasse);
-            Assert.Equal("123", createdTierheim.Adresse.Hausnummer);
-            Assert.Equal("Test City", createdTierheim.Adresse.Stadt);
-            Assert.Equal("Test Country", createdTierheim.Adresse.Land);
+            Assert.NotNull(newHund);
+            Assert.Equal(ApplicationTestFixtures.hundInsHeimDto(newTierheim.Id).Name, newHund.Name);
         }
-    }
 
 
-    [Fact]
-    public void NewTierheim_StartDateInFuture_ThrowsException_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
+
+        [Fact]
+        public void DeleteTierheim_RemovesTierheimFromDatabase_WhenValidIdProvided()
         {
-            TierheimService unitToTest = InitUnitToTest(db);
-
-            NewTierheimDto entity = new NewTierheimDto()
-            {
-                Name = "Test Tierheim",
-                StartDate = DateTime.Now.AddDays(10), // StartDate in the future
-                EndDate = DateTime.Now.AddDays(20),
-                Street = "Test Street",
-                Number = "123",
-                City = "Test City",
-                Country = "Test Country"
-            };
-
-            // Act + Assert
-            ServiceException ex = Assert.Throws<ServiceException>(() => unitToTest.NewTierheim(entity));
-            Assert.Equal("Start date muss in Vergangheit sein!", ex.Message);
-        }
-    }
-
-
-
-    [Fact]
-    public void NewTierheim_EndDateInPast_ThrowsException_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-        {
-            TierheimService unitToTest = InitUnitToTest(db);
-
-            NewTierheimDto entity = new NewTierheimDto()
-            {
-                Name = "Test Tierheim",
-                StartDate = DateTime.Now.AddDays(-20),
-                EndDate = DateTime.Now.AddDays(-10), // EndDate in the past
-                Street = "Test Street",
-                Number = "123",
-                City = "Test City",
-                Country = "Test Country"
-            };
-
-            // Act + Assert
-            ServiceException ex = Assert.Throws<ServiceException>(() => unitToTest.NewTierheim(entity));
-            Assert.Equal("End date muss in Zukunft sein!", ex.Message);
-        }
-    }
-
-
-
-    [Fact]
-    public void HundInsHeim_Success_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-        {
-            // Setup DB
-            TierheimService unitToTest = InitUnitToTest(db);
-            DatabaseUtilities.InitializeDatabase(db);
-
-            // Assuming there is already a Tierheimhaus in the database
-            var tierheimhaus = db.Tierheimhaeuser.First();
-
-            // Set up Hund DTO
-            HundInsHeimDto entity = new HundInsHeimDto()
-            {
-                TierhausName = tierheimhaus.Name,
-                Name = "Test Hund",
-                IsBissig = false,
-                Geschlecht = Geschlecht.Mann,
-                Alter = 5
-            };
+            // Arrange
+            var newTierheim = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto());
 
             // Act
-            unitToTest.HundInsHeim(entity);
+            _tierheimService.DeleteTierheim(newTierheim.Id);
 
             // Assert
-            var hund = db.Haustiere.OfType<Hund>().FirstOrDefault(h => h.Name == "Test Hund");
-            Assert.NotNull(hund);
-            Assert.Equal("Test Hund", hund.Name);
-            Assert.Equal(Geschlecht.Mann, hund.Geschlecht);
-            Assert.Equal(5, hund.Alter);
-            Assert.False(hund.IsBissig);
-            Assert.Contains(hund, tierheimhaus.Tiere);
+            Assert.Throws<ArgumentException>(() => _tierheimService.GetOne(newTierheim.Id));
         }
-    }
 
 
 
-    [Fact]
-    public void KatzeInsHeim_Success_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
+        [Fact]
+        public void DeleteTierheim_ThrowsTierheimServiceException_WhenInvalidIdProvided()
         {
-            // Setup DB
-            TierheimService unitToTest = InitUnitToTest(db);
-            DatabaseUtilities.InitializeDatabase(db);
+            // Arrange
+            var invalidId = 999;
 
-            // Assuming there is already a Tierheimhaus in the database
-            var tierheimhaus = db.Tierheimhaeuser.First();
+            // Act and Assert
+            Assert.Throws<TierheimServiceException>(() => _tierheimService.DeleteTierheim(invalidId));
+        }
 
-            // Set up Katze DTO
-            KatzeInsHeimDto entity = new KatzeInsHeimDto()
-            {
-                TierhausName = tierheimhaus.Name,
-                Name = "Test Katze",
-                IsAnschmiegsam = true,
-                Geschlecht = Geschlecht.Frau,
-                Alter = 3
-            };
+
+
+        [Fact]
+        public void NewTierheim_ThrowsTierheimServiceException_WhenInvalidDtoProvided()
+        {
+            // Arrange
+            var invalidTierheimDto = ApplicationTestFixtures.invalidTierheimDto();
+
+            // Act and Assert
+            Assert.Throws<TierheimServiceException>(() => _tierheimService.NewTierheim(invalidTierheimDto));
+        }
+
+
+
+        [Fact]
+        public void HundInsHeim_ThrowsTierheimServiceException_WhenTierheimDoesNotExist()
+        {
+            // Arrange
+            var nonExistentTierheimId = 999;
+            var hundInsHeimDto = ApplicationTestFixtures.hundInsHeimDto(nonExistentTierheimId);
+
+            // Act and Assert
+            Assert.Throws<TierheimServiceException>(() => _tierheimService.HundInsHeim(hundInsHeimDto));
+        }
+
+
+        [Fact]
+        public void NewTierheim_ThrowsTierheimServiceException_WhenInvalidEntityProvided()
+        {
+            // Act and Assert
+            Assert.Throws<TierheimServiceException>(() => _tierheimService.NewTierheim(ApplicationTestFixtures.invalidTierheimDto()));
+        }
+
+
+
+        [Fact]
+        public void GetAll_ReturnsAllSheltersSortedAscendingByName_WhenSortParameterIsAscSort()
+        {
+            // Arrange
+            var newTierheim1 = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto());
+            var newTierheim2 = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto2());
+
+            var currentPage = 1;
+            var itemsPerPage = 10;
+            var sort = "asc_sort";
 
             // Act
-            unitToTest.KatzeInsHeim(entity);
+            var result = _tierheimService.GetAll(currentPage, itemsPerPage, sort);
 
             // Assert
-            var katze = db.Haustiere.OfType<Katze>().FirstOrDefault(k => k.Name == "Test Katze");
-            Assert.NotNull(katze);
-            Assert.Equal("Test Katze", katze.Name);
-            Assert.Equal(Geschlecht.Frau, katze.Geschlecht);
-            Assert.Equal(3, katze.Alter);
-            Assert.True(katze.IsAnschmiegsam);
-            Assert.Contains(katze, tierheimhaus.Tiere);
+            Assert.Equal(2, result.Count);
+            Assert.Equal("TestTierheim", result[0].Name);
+            Assert.Equal("XestTierheim", result[1].Name);
         }
-    }
 
 
 
-    [Fact]
-    public void HundInsHeim_TierheimhausNotFound_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
+        [Fact]
+        public void GetAll_ReturnsAllSheltersSortedDescendingByName_WhenSortParameterIsDescSort()
         {
-            // Setup DB and Service
-            TierheimService unitToTest = InitUnitToTest(db);
-            DatabaseUtilities.InitializeDatabase(db);
+            // Arrange
+            var newTierheim1 = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto());
+            var newTierheim2 = _tierheimService.NewTierheim(ApplicationTestFixtures.tierheimDto2());
 
-            // Set up Hund DTO
-            HundInsHeimDto entity = new HundInsHeimDto()
-            {
-                TierhausName = "NonExistentTierheim",
-                Name = "Test Hund",
-                IsBissig = false,
-                Geschlecht = Geschlecht.Mann,
-                Alter = 5
-            };
-
-            // Assert
-            var ex = Assert.Throws<ServiceException>(() => unitToTest.HundInsHeim(entity));
-            Assert.Equal("HundInsHeim ist fehlgeschlagen, der arme Hund!", ex.Message);
-        }
-    }
-
-
-
-    [Fact]
-    public void KatzeInsHeim_TierheimhausNotFound_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-        {
-            // Setup DB and Service
-            TierheimService unitToTest = InitUnitToTest(db);
-            DatabaseUtilities.InitializeDatabase(db);
-
-            // Set up Katze DTO
-            KatzeInsHeimDto entity = new KatzeInsHeimDto()
-            {
-                TierhausName = "NonExistentTierheim",
-                Name = "Test Katze",
-                IsAnschmiegsam = true,
-                Geschlecht = Geschlecht.Frau,
-                Alter = 3
-            };
-
-            // Assert
-            var ex = Assert.Throws<ServiceException>(() => unitToTest.KatzeInsHeim(entity));
-            Assert.Equal("KatzeInsHeim ist fehlgeschlagen, die arme Katze!", ex.Message);
-        }
-    }
-
-
-
-    [Fact]
-    public void GetAll_AscendingSortAndPaging_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-        {
-            // Setup DB
-            DatabaseUtilities.InitializeDatabase(db);
-            TierheimService unitToTest = InitUnitToTest(db);
+            var currentPage = 1;
+            var itemsPerPage = 10;
+            var sort = "desc_sort";
 
             // Act
-            List<Tierheimhaus> result = unitToTest.GetAll(1, 3, "asc_sort");
+            var result = _tierheimService.GetAll(currentPage, itemsPerPage, sort);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(3, result.Count);
-            Assert.True(string.Compare(result[0].Name, result[1].Name) < 0);
-            Assert.True(string.Compare(result[1].Name, result[2].Name) < 0);
+            Assert.Equal(2, result.Count);
+            Assert.Equal("XestTierheim", result[0].Name);
+            Assert.Equal("TestTierheim", result[1].Name);
         }
+
     }
-
-
-
-    [Fact]
-    public void GetAll_DescendingSortAndPaging_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-        {
-            // Setup DB
-            DatabaseUtilities.InitializeDatabase(db);
-            TierheimService unitToTest = InitUnitToTest(db);
-
-            // Act
-            List<Tierheimhaus> result = unitToTest.GetAll(1, 3, "desc_sort");
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(3, result.Count);
-            Assert.True(string.Compare(result[0].Name, result[1].Name) > 0);
-            Assert.True(string.Compare(result[1].Name, result[2].Name) > 0);
-        }
-    }
-
-
-
-    [Fact]
-    public void GetAll_PageOutOfBounds_Test()
-    {
-        // Arrange
-        using (TierheimContext db = new TierheimContext(GenerateDbOptions()))
-        {
-            // Setup DB
-            DatabaseUtilities.InitializeDatabase(db);
-            TierheimService unitToTest = InitUnitToTest(db);
-
-            // Act
-            var result = unitToTest.GetAll(100, 3, "asc_sort");
-
-            // Assert
-            Assert.NotNull(result);
-            Assert.Empty(result);
-        }
-    }
-    
-
 }
-*/

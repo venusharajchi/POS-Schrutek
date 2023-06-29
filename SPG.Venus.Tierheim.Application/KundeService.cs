@@ -35,6 +35,22 @@ namespace SPG.Venus.Tierheim.Application
 
         // GET ALL -----------------------------------------------------------------
 
+
+        public Kunde GetOne(int id)
+        {
+            return _kundeValidationService.GetKundeById(id);
+        }
+
+
+
+
+        public List<Kunde> GetAll()
+        {
+            return _kundeRepository.GetAll().ToList();
+        }
+
+
+
         public List<Kunde> GetAll(int currentPage, int itemsPerPage, string sort = "asc_sort")
         {
             // Sort Kunde
@@ -53,7 +69,7 @@ namespace SPG.Venus.Tierheim.Application
 
         // NEW KUNDE ---------------------------------------------------------------
 
-        public void NewKunde(NewKundeDto dto)
+        public Kunde NewKunde(NewKundeDto dto)
         {
             try
             {
@@ -63,6 +79,8 @@ namespace SPG.Venus.Tierheim.Application
 
                 // -> KundeRepositoryException
                 _kundeRepository.Create(kunde);
+
+                return kunde;
             }
             catch (ArgumentException ex)
             {
@@ -81,7 +99,7 @@ namespace SPG.Venus.Tierheim.Application
 
         // UPDATE KUNDE ------------------------------------------------------------
 
-        public void UpdateKunde(UpdateKundeDto dto)
+        public Kunde UpdateKunde(UpdateKundeDto dto)
         {
             try
             {
@@ -95,6 +113,8 @@ namespace SPG.Venus.Tierheim.Application
 
                 // -> KundeRepositoryException
                 _kundeRepository.Update(kunde);
+
+                return kunde;
             }
             catch (ArgumentException ex)
             {
@@ -113,7 +133,7 @@ namespace SPG.Venus.Tierheim.Application
 
         // HOLE HAUSTIER AUS HEIM ------------------------------------------------------
 
-        public void HoleHaustierAusHeim(HaustierAusHeimDto dto)
+        public Haustier HoleHaustierAusHeim(HaustierAusHeimDto dto)
         {
             // Transaction
             using (var transaction = _kundeRepository.GetContext().Database.BeginTransaction())
@@ -138,6 +158,8 @@ namespace SPG.Venus.Tierheim.Application
                     _tierheimRepository.Update(tierheim);
 
                     transaction.Commit();
+
+                    return haustier;
                 }
                 catch (ArgumentException ex)
                 {
