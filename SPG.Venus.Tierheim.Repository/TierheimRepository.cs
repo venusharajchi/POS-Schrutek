@@ -1,15 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SPG.Venus.Tierheim.Domain.Model;
-using SPG.Venus.Tierheim.Domain.Interfaces;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using SPG.Venus.Tierheim.Domain.Exceptions;
+using SPG.Venus.Tierheim.Domain.Interfaces;
+using SPG.Venus.Tierheim.Domain.Model;
 using SPG.Venus.Tierheim.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SPG.Venus.Tierheim.Repository.Tierheim
+namespace SPG.Venus.Tierheim.Repository
 {
     public class TierheimRepository : ITierheimRepository, IReadOnlyTierheimRepository
     {
@@ -20,45 +16,76 @@ namespace SPG.Venus.Tierheim.Repository.Tierheim
             _db = db;
         }
 
-        public void Create(Tierheimhaus newEntity)
-        {
-            try
-            {
-                DbSet<Tierheimhaus> dbSet = _db.Set<Tierheimhaus>();
-                dbSet.Add(newEntity);
-                _db.SaveChanges();
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new RepositoryException("Create nicht möglich!", ex);
-            }
-        }
-
-        public void Update(Tierheimhaus entity)
-        {
-            try
-            {
-                Tierheimhaus? existingEntity = _db.Set<Tierheimhaus>().Find(entity.Name);
-
-                if (existingEntity == null)
-                    throw new RepositoryException($"Tierheimhaus with id {entity.Id} not found!");
-                
-                // If the entity exists in the database, update its properties.
-                 _db.Entry(existingEntity).CurrentValues.SetValues(entity);
-                 _db.SaveChanges();
-                
-            }
-            catch (DbUpdateException ex)
-            {
-                throw new RepositoryException("Update nicht möglich!", ex);
-            }
-        }
 
 
         public IQueryable<Tierheimhaus> GetAll()
         {
-            return _db.Set<Tierheimhaus>();
+            return _db.Tierheimhaeuser.Include(th => th.Tiere);
+        }
+
+
+
+        public IQueryable<Tierheimhaus> GetById(int id)
+        {
+            return _db.Tierheimhaeuser.Include(th => th.Tiere).Where(th => th.Id == id);
+        }
+
+
+
+        public IQueryable<Tierheimhaus> GetByName(String name)
+        {
+            return _db.Tierheimhaeuser.Include(th => th.Tiere).Where(th => th.Name == name);
+        }
+
+
+
+        public void Create(Tierheimhaus newEntity)
+        {
+            DbSet<Tierheimhaus> dbSet = _db.Set<Tierheimhaus>();
+            dbSet.Add(newEntity);
+
+            try
+            {
+                _db.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new TierheimRepositoryException("Create not possible!", ex);
+            }
+        }
+
+
+
+        public void Update(Tierheimhaus entity)
+        {
+            DbSet<Tierheimhaus> dbSet = _db.Set<Tierheimhaus>();
+            dbSet.Update(entity);
+
+            try
+            {
+                _db.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new TierheimRepositoryException("Update not possible!", ex);
+            }
+        }
+
+
+
+        public void Delete(int id)
+        {
+            Tierheimhaus? entity = GetById(id).SingleOrDefault();
+            if (entity != null)
+            {
+                DbSet<Tierheimhaus> dbSet = _db.Set<Tierheimhaus>();
+                dbSet.Remove(entity);
+                _db.SaveChanges();
+            }
+            else
+            {
+                throw new TierheimRepositoryException($"Tierheimhaus with ID '{id}' not found!");
+            }
         }
     }
 }
-

@@ -1,7 +1,9 @@
-﻿using SPG.Venus.Tierheim.Domain.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using SPG.Venus.Tierheim.Domain.Interfaces;
 
 namespace SPG.Venus.Tierheim.Domain.Model
 {
+    // ROOT AGGREGATE
     public class Kunde : EntityBase, IFindableByGuid
     {
 
@@ -19,7 +21,6 @@ namespace SPG.Venus.Tierheim.Domain.Model
 
 
         private List<Haustier> _tiere = new();
-        // Lambda function
         public virtual IReadOnlyList<Haustier> Tiere => _tiere;
 
 
@@ -51,6 +52,7 @@ namespace SPG.Venus.Tierheim.Domain.Model
             return katze;
         }
 
+
         // Holt einen Hund vom Heim und added es in seine Haustierliste
         public Hund HoleHundAusHeim(Tierheimhaus tierheim, int maxAlter)
         {
@@ -59,12 +61,22 @@ namespace SPG.Venus.Tierheim.Domain.Model
             return hund;
         }
 
+
+
+        // Finded zufällig ein Haustier :)
+        public void AddHaustier(Haustier haustier)
+        {
+            _tiere.Add(haustier);
+        }
+
+
         // Bringt alle Haustiere in das Heim zurück
         public void AlleZurueckInsHeimBringen(Tierheimhaus tierheim)
         {
             _tiere.ForEach(tier => tierheim.TierInsHeimBringen(tier));
             _tiere.Clear();
         }
+
 
         // Wieviele Haustiere hat der Kunde bei sich zu Hause?
         public int TiereZaehlen()

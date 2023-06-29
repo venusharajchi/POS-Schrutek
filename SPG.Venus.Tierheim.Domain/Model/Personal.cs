@@ -20,8 +20,7 @@ namespace SPG.Venus.Tierheim.Domain.Model
 
 
         // NAVIGATION
-        public int TierheimhausNavigationId { get; set; }
-        public virtual Tierheimhaus TierheimNavigation { get; private set; } = default!;
+        public virtual Tierheimhaus TierheimNavigation { get; set; } = default!;
 
 
 
@@ -32,14 +31,13 @@ namespace SPG.Venus.Tierheim.Domain.Model
 
 
         public Personal(Guid guid, string vorname, string nachname,
-            Geschlecht geschlecht, string dienstnummer, Tierheimhaus tierheimNavigation)
+            Geschlecht geschlecht, string dienstnummer)
         {
             Guid = guid;
             Vorname = vorname;
             Nachname = nachname;
             Geschlecht = geschlecht;
             Dienstnummer = dienstnummer;
-            TierheimNavigation = tierheimNavigation;
         }
 
 

@@ -1,6 +1,9 @@
-﻿namespace SPG.Venus.Tierheim.Domain.Model
+﻿using SPG.Venus.Tierheim.Domain.Interfaces;
+
+namespace SPG.Venus.Tierheim.Domain.Model
 {
-    public class Tierheimhaus : EntityBase
+    // ROOT AGGREGATE
+    public class Tierheimhaus : EntityBase, IFindableByGuid
     {
 
         // PROPERTIES ----------------------------------------------------------
@@ -10,13 +13,41 @@
 
         public Addresse Adresse { get; set; }
 
-
         public String Name { get; set; }
 
 
         // Wann ist das Heim geöffnet
-        public DateTime OeffungszeitVon { get; set; }
-        public DateTime OeffungszeitBis { get; set; }
+        private TimeSpan _oeffungszeitVon = TimeSpan.Zero;
+        private TimeSpan _oeffungszeitBis = TimeSpan.Zero;
+
+        public TimeSpan OeffungszeitVon
+        {
+            get { return _oeffungszeitVon; }
+            set
+            {
+                if (_oeffungszeitBis != TimeSpan.Zero && value >= _oeffungszeitBis)
+                {
+                    throw new ArgumentException("OeffungszeitVon must be before OeffungszeitBis");
+                }
+
+                _oeffungszeitVon = value;
+            }
+        }
+
+        public TimeSpan OeffungszeitBis
+        {
+            get { return _oeffungszeitBis; }
+            set
+            {
+                if (_oeffungszeitVon != TimeSpan.Zero && value <= _oeffungszeitVon)
+                {
+                    throw new ArgumentException("OeffungszeitBis must be after OeffungszeitVon");
+                }
+
+                _oeffungszeitBis = value;
+            }
+        }
+
 
 
         // Das Personal des Heims
@@ -30,14 +61,20 @@
 
 
 
+
         // CTOR ----------------------------------------------------------------
 
         protected Tierheimhaus() { }
 
 
         public Tierheimhaus(Guid guid, String name, Addresse adresse,
-            DateTime oeffungszeitVon, DateTime oeffungszeitBis)
+            TimeSpan oeffungszeitVon, TimeSpan oeffungszeitBis)
         {
+            if (oeffungszeitBis <= oeffungszeitVon)
+            {
+                throw new ArgumentException("OeffungszeitBis must be after OeffungszeitVon");
+            }
+
             Guid = guid;
             Name = name;
             Adresse = adresse;
@@ -56,23 +93,37 @@
         }
 
 
-        // Nimmt eine Katze aus dem Heim und retourniert die Referenz
+
+        // Nimmt eine Katze aus dem Heim und gibt die Referenz zurück
         public Katze KatzeMitnehmen(int maxAlter)
         {
-            // Bitte Katze suchen gehen
-            Katze katze = (Katze)_tiere.First(tier => tier is Katze && ((Katze)tier).Alter <= maxAlter);
+            Katze? katze = _tiere.FirstOrDefault(tier => tier is Katze && ((Katze)tier).Alter <= maxAlter) as Katze;
+
+            if (katze == null)
+                throw new InvalidOperationException("Keine passende Katze im Tierheimhaus gefunden.");
+
             _tiere.Remove(katze);
+
             return katze;
         }
 
-        // Nimmt einen Hund aus dem Heim und retourniert die Referenz
+
+
+        // Nimmt einen Hund aus dem Heim und gibt die Referenz zurück
         public Hund HundMitnehmen(int maxAlter)
         {
-            // Bitte Hund suchen gehen
-            Hund hund = (Hund)_tiere.First(tier => tier is Hund && ((Hund)tier).Alter <= maxAlter);
+            Hund? hund = _tiere.FirstOrDefault(tier => tier is Hund && ((Hund)tier).Alter <= maxAlter) as Hund;
+
+            if (hund == null)
+                throw new InvalidOperationException("Keinen passenden Hund im Tierheimhaus gefunden.");
+
             _tiere.Remove(hund);
+
             return hund;
         }
+
+
+
 
         // Impft alle Haustiere im Heim
         public void AlleTiereImpfenLassen()
@@ -88,16 +139,22 @@
 
         }
 
-        // Stellt ein Personal ins Heim an
+
+        // Stellt ein Personal ins Heim an, 2-seitige Assoziation
         public void PersonalAnstellen(Personal personal)
         {
-            // Maximal 3 Personal im Tierhim
+            // Maximal 10 Personal im Tierhim
             if (_personal.Count < 3)
             {
                 // Aber keine zweimal
                 if (!_personal.Contains(personal))
                 {
-                    _personal.Add(personal);
+                    // Noch Frei
+                    if (personal.TierheimNavigation == null)
+                    {
+                        _personal.Add(personal);
+                        personal.TierheimNavigation = this;
+                    }
                 }
                 else
                 {
@@ -111,20 +168,12 @@
         }
 
 
+
         // Stellt mehrere Personal ins Heim an
         public void PersonalAnstellen(List<Personal> personalListe)
         {
             foreach (var personal in personalListe)
-            {
-                try
-                {
-                    PersonalAnstellen(personal);
-                }
-                catch (ArgumentException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
+                PersonalAnstellen(personal);
         }
 
 

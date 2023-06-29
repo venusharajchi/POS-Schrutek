@@ -1,118 +1,211 @@
-﻿using Bogus.DataSets;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SPG.Venus.Tierheim.Domain.Dtos;
 using SPG.Venus.Tierheim.Domain.Exceptions;
 using SPG.Venus.Tierheim.Domain.Interfaces;
 using SPG.Venus.Tierheim.Domain.Model;
 using SPG.Venus.Tierheim.Repository;
-using SPG.Venus.Tierheim.Repository.Tierheim;
 
-namespace SPG.Venus.Tierheim.Application;
-
-public class KundeService
+namespace SPG.Venus.Tierheim.Application
 {
-    // REPOS -------------------------------------------------------------------
-    private readonly KundeRepository _kundeRepository;
-    private readonly TierheimRepository _tierheimRepository;
-
-    private readonly IReadOnlyRepositoryBase<Kunde> _readOnlyKundeRepository;
-    private readonly IReadOnlyRepositoryBase<Tierheimhaus> _readOnlyTierheimRepository;
-    // -------------------------------------------------------------------------
-
-
-    public KundeService
-    (
-        KundeRepository kundeRepository,
-        TierheimRepository tierheimRepository,
-
-        IReadOnlyRepositoryBase<Kunde> readOnlyKundeRepository,
-        IReadOnlyRepositoryBase<Tierheimhaus> readOnlyTierheimRepository
-    )
+    public class KundenService
     {
-        _kundeRepository = kundeRepository;
-        _tierheimRepository = tierheimRepository;
+        private readonly KundeRepository _kundeRepository;
+        private readonly KundeValidationService _kundeValidationService;
 
-        _readOnlyKundeRepository = readOnlyKundeRepository;
-        _readOnlyTierheimRepository = readOnlyTierheimRepository;
-    }
-
+        private readonly TierheimRepository _tierheimRepository;
+        private readonly TierheimValidationService _tierheimhausValidationService;
 
 
-    // CREATE KUNDE ------------------------------------------------------------
+        public KundenService(
+            KundeRepository kundeRepository,
+            KundeValidationService kundeValidationService,
 
-    public void NewKunde(NewKundeDto dto)
-    {
-        try
+            TierheimRepository tierheimRepository,
+            TierheimValidationService tierheimhausValidationService
+        )
         {
-            // Map Dto to Address Domain
-            var address = new Addresse(dto.Street, dto.Number, dto.City, dto.Country);
+            _tierheimRepository = tierheimRepository;
+            _kundeRepository = kundeRepository;
 
-            // Map Dto to Kunde Domain
-            var newKunde = new Kunde(Guid.NewGuid(), dto.Vorname, dto.Nachname, address, dto.Geschlecht);
-
-            // Save Kunde in DB
-            _kundeRepository.Create(newKunde);
+            _tierheimhausValidationService = tierheimhausValidationService;
+            _kundeValidationService = kundeValidationService;
         }
-        // Exception Translation
-        catch (RepositoryException ex)
+
+
+
+        // GET ALL -----------------------------------------------------------------
+
+        public List<Kunde> GetAll(int currentPage, int itemsPerPage, string sort = "asc_sort")
         {
-            throw new ServiceException("Create Kunde ist fehlgeschlagen!", ex);
+            // Sort Kunde
+            var tierheimhausQuery = sort.Equals("asc_sort")
+               ? _kundeRepository.GetAll().OrderBy(t => t.Nachname)
+               : _kundeRepository.GetAll().OrderByDescending(t => t.Nachname);
+
+            // Page Kunde
+            return tierheimhausQuery.Skip((currentPage - 1) * itemsPerPage)
+                 .Take(itemsPerPage)
+                 .ToList();
         }
-    }
 
 
 
 
-    // GET ALL -----------------------------------------------------------------
+        // NEW KUNDE ---------------------------------------------------------------
 
-    public List<Kunde> GetAll(int currentPage, int itemsPerPage, string sort = "asc_sort")
-    {
-        try
+        public void NewKunde(NewKundeDto dto)
         {
-            // Sort Kunden
-            var kundeQuery = sort.Equals("asc_sort")
-                ? _kundeRepository.GetAll().OrderBy(k => k.Nachname)
-                : _kundeRepository.GetAll().OrderByDescending(k => k.Nachname);
+            try
+            {
+                // -> ArgumentEx
+                var addresse = new Addresse(dto.Street, dto.Number, dto.City, dto.Country);
+                var kunde = new Kunde(Guid.NewGuid(), dto.Vorname, dto.Nachname, addresse, dto.Geschlecht);
 
-            // Page Kunden
-            return kundeQuery.Skip((currentPage - 1) * itemsPerPage)
-                .Take(itemsPerPage)
-                .ToList();
+                // -> KundeRepositoryException
+                _kundeRepository.Create(kunde);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new KundeServiceException(
+                    "KundeService#NewKunde: Kunden Validation Error", ex);
+            }
+            catch (KundeRepositoryException ex)
+            {
+                throw new KundeServiceException(
+                    "KundeService#NewKunde: Kunden DB Error", ex);
+            }
         }
-        // Exception Translation
-        catch (RepositoryException ex)
+
+
+
+
+        // UPDATE KUNDE ------------------------------------------------------------
+
+        public void UpdateKunde(UpdateKundeDto dto)
         {
-            throw new ServiceException("GetAll Kunden ist fehlgeschlagen!", ex);
+            try
+            {
+                // -> ArgumentEx
+                Kunde kunde = _kundeValidationService.GetKundeById(dto.KundeId);
+
+                kunde.Vorname = dto.Vorname;
+                kunde.Nachname = dto.Nachname;
+                kunde.Adresse = new Addresse(dto.Street, dto.Number, dto.City, dto.Country);
+                kunde.Geschlecht = dto.Geschlecht;
+
+                // -> KundeRepositoryException
+                _kundeRepository.Update(kunde);
+            }
+            catch (ArgumentException ex)
+            {
+                throw new KundeServiceException(
+                    "KundeService#UpdateKunde: Kunden Validation Error", ex);
+            }
+            catch (KundeRepositoryException ex)
+            {
+                throw new KundeServiceException(
+                    "KundeService#UpdateKunde: Kunden DB Error", ex);
+            }
         }
-    }
 
 
 
 
-    // HOLE HUND AUS HEIM ------------------------------------------------------
+        // HOLE HAUSTIER AUS HEIM ------------------------------------------------------
 
-    public void HoleHundAusHeim(Guid kundenGuid, string tierheimName, int maxAlter)
-    {
-        try
+        public void HoleHaustierAusHeim(HaustierAusHeimDto dto)
         {
-            Kunde? kunde = _readOnlyKundeRepository.GetByGuid<Kunde>(kundenGuid);
-            if (kunde == null)
-                throw new RepositoryException($"Kunde mit Id {kundenGuid} nicht gefunden!");
+            // Transaction
+            using (var transaction = _kundeRepository.GetContext().Database.BeginTransaction())
+            {
+                try
+                {
+                    // -> ArgumentEx
+                    Kunde kunde = _kundeValidationService.GetKundeById(dto.KundeId);
+                    Tierheimhaus tierheim = _tierheimhausValidationService.getTierheimById(dto.TierheimId);
 
+                    Haustier haustier;
+                    if (dto.Tierart == Tierart.Hund)
+                        haustier = tierheim.HundMitnehmen(dto.MaxAlter);
+                    else if (dto.Tierart == Tierart.Katze)
+                        haustier = tierheim.KatzeMitnehmen(dto.MaxAlter);
+                    else
+                        throw new ArgumentException("Invalid Tierart specified.");
 
-            Tierheimhaus? tierheimhaus = _readOnlyTierheimRepository.GetByPK<string, Personal>(tierheimName);
-            if (tierheimhaus == null)
-                throw new RepositoryException($"Tierheimhaus mit Name {tierheimhaus} nicht gefunden!");
+                    kunde.AddHaustier(haustier);
 
-            // Update DB
-            kunde.HoleHundAusHeim(tierheimhaus, maxAlter);
-            _kundeRepository.Update(kunde);
-            _tierheimRepository.Update(tierheimhaus);
+                    _kundeRepository.Update(kunde);
+                    _tierheimRepository.Update(tierheim);
+
+                    transaction.Commit();
+                }
+                catch (ArgumentException ex)
+                {
+                    transaction.Rollback();
+                    throw new KundeServiceException("KundenService#HoleHaustierAusHeim: Kunden Validation Error", ex);
+                }
+                catch (KundeRepositoryException ex)
+                {
+                    transaction.Rollback();
+                    throw new KundeServiceException("KundenService#HoleHaustierAusHeim: Kunden DB Error", ex);
+                }
+                catch (TierheimRepositoryException ex)
+                {
+                    transaction.Rollback();
+                    throw new KundeServiceException("KundenService#HoleHaustierAusHeim: Tierheim DB Error", ex);
+                }
+            }
         }
-        // Exception Translation
-        catch (RepositoryException ex)
+
+
+
+
+
+        // ALLE TIERE ZURÜCKBRINGEN ------------------------------------------------
+
+        public void AlleTiereZurueckBringen(AlleTiereZurueckBringenDto dto)
         {
-            throw new ServiceException("GetAll Kunden ist fehlgeschlagen!", ex);
+            // Transaction
+            using (var transaction = _kundeRepository.GetContext().Database.BeginTransaction())
+            {
+                try
+                {
+                    Kunde kunde = _kundeValidationService.GetKundeById(dto.KundeId);
+                    Tierheimhaus tierheim = _tierheimhausValidationService.getTierheimById(dto.TierheimId);
+
+                    kunde.AlleZurueckInsHeimBringen(tierheim);
+
+                    _kundeRepository.Update(kunde);
+                    _tierheimRepository.Update(tierheim);
+                }
+                catch (ArgumentException ex)
+                {
+                    throw new KundeServiceException(
+                        "KundenService#AlleTiereZurueckBringen: Kunden Validation Error", ex);
+                }
+                catch (KundeRepositoryException ex)
+                {
+                    throw new KundeServiceException(
+                        "KundenService#AlleTiereZurueckBringen: Kunden DB Error", ex);
+                }
+            }
+        }
+
+
+
+        // DELETE KUNDE ------------------------------------------------------------
+
+        public void DeleteKunde(int kundeId)
+        {
+            try
+            {
+                _kundeRepository.Delete(kundeId);
+            }
+            catch (KundeRepositoryException ex)
+            {
+                throw new KundenServiceException(
+                    "KundenService#DeleteKunde: Kunden DB Error", ex);
+            }
         }
     }
 }

@@ -3,60 +3,24 @@ using SPG.Venus.Tierheim.Domain.Dtos;
 using SPG.Venus.Tierheim.Domain.Exceptions;
 using SPG.Venus.Tierheim.Domain.Interfaces;
 using SPG.Venus.Tierheim.Domain.Model;
-using SPG.Venus.Tierheim.Repository.Tierheim;
+using SPG.Venus.Tierheim.Repository;
 
 namespace SPG.Venus.Tierheim.Application;
 
 public class TierheimService
 {
     private readonly TierheimRepository _tierheimRepository;
-    private readonly IReadOnlyRepositoryBase<Tierheimhaus> _readOnlyTierheimRepository;
-
+    private readonly TierheimValidationService _tierheimValidationService;
 
     public TierheimService
     (
         TierheimRepository tierheimRepository,
-        IReadOnlyRepositoryBase<Tierheimhaus> readOnlyProductRepository
+        TierheimValidationService tierheimValidationService
     )
     {
         _tierheimRepository = tierheimRepository;
-        _readOnlyTierheimRepository = readOnlyProductRepository;
+        _tierheimValidationService = tierheimValidationService;
     }
-
-
-
-    // CREATE TIERHEIM ---------------------------------------------------------
-
-    // Data Transfer Object
-    public void NewTierheim(NewTierheimDto dto)
-    {
-        try
-        {
-            // Verify StartDate is in the past
-            if (dto.StartDate > DateTime.Now)
-                throw new ServiceException("Start date muss in Vergangheit sein!");
-
-            // Verify EndDate is in the future
-            if (dto.EndDate < DateTime.Now)
-                throw new ServiceException("End date muss in Zukunft sein!");
-
-            // Map Dto to Address Domain
-            var address = new Addresse(dto.Street, dto.Number, dto.City, dto.Country);
-
-            // Map Dto to Tierheim Domain
-            var newTierheim = new Tierheimhaus(Guid.NewGuid(),
-                dto.Name, address,  dto.StartDate, dto.EndDate);
-
-            // Save Tierheim in DB
-            _tierheimRepository.Create(newTierheim);
-        }
-        // Exception Translation
-        catch (RepositoryException ex)
-        {
-            throw new ServiceException("Create Tierheim ist fehlgeschlagen!", ex);
-        }
-    }
-
 
 
 
@@ -64,23 +28,42 @@ public class TierheimService
 
     public List<Tierheimhaus> GetAll(int currentPage, int itemsPerPage, string sort = "asc_sort")
     {
+        // Sort Tierheime
+        var tierheimhausQuery = sort.Equals("asc_sort")
+           ? _tierheimRepository.GetAll().OrderBy(t => t.Name)
+           : _tierheimRepository.GetAll().OrderByDescending(t => t.Name);
+
+        // Page Tierheime
+        return tierheimhausQuery.Skip((currentPage - 1) * itemsPerPage)
+             .Take(itemsPerPage)
+             .ToList();
+    }
+
+
+
+
+    // CREATE TIERHEIM ---------------------------------------------------------
+
+    public void NewTierheim(NewTierheimDto dto)
+    {
         try
         {
-            // Sort Tierheime
-            var tierheimhausQuery = sort.Equals("asc_sort")
-                ? _tierheimRepository.GetAll().OrderBy(t => t.Name)
-                : _tierheimRepository.GetAll().OrderByDescending(t => t.Name);
+            // -> ArgumentEx
+            var address = new Addresse(dto.Street, dto.Number, dto.City, dto.Country);
+            var newTierheim = new Tierheimhaus(Guid.NewGuid(), dto.Name, address, dto.StartDate, dto.EndDate);
 
-            // Page Tierheime
-            // LINQ
-            return tierheimhausQuery.Skip((currentPage - 1) * itemsPerPage)
-                .Take(itemsPerPage)
-                .ToList();
+            // -> TierheimRepositoryEx
+            _tierheimRepository.Create(newTierheim);
         }
-        // Exception Translation
-        catch (RepositoryException ex)
+        catch(ArgumentException ex)
         {
-            throw new ServiceException("GetAll Tierheime ist fehlgeschlagen!", ex);
+            throw new TierheimServiceException(
+                "TierheimService#NewTierheim: Tierheim Validation Error", ex);
+        }
+        catch (TierheimRepositoryException ex)
+        {
+            throw new TierheimServiceException(
+                "TierheimService#NewTierheim: Tierheim DB Error", ex);
         }
     }
 
@@ -91,27 +74,32 @@ public class TierheimService
 
     public void HundInsHeim(HundInsHeimDto dto)
     {
+
         try
         {
-            // Haus exsists?
-            Tierheimhaus? haus = _readOnlyTierheimRepository.GetByPK<string, Personal>(dto.TierhausName);
-            if (haus == null)
-                throw new RepositoryException($"Tierheimhaus mit Name {dto.TierhausName} nicht gefunden!");
+            // -> ArgumentEx
+            Tierheimhaus tierheim = _tierheimValidationService.getTierheimById(dto.TierheimId);
 
-            // Map Dto to Hund Domain
+            // -> ArgumentEx
             var hund = new Hund(Guid.NewGuid(), dto.IsBissig, dto.Name, dto.Geschlecht, dto.Alter);
+            tierheim.TierInsHeimBringen(hund);
 
-            // Update DB
-            haus.TierInsHeimBringen(hund);
-            _tierheimRepository.Update(haus);
+            // -> TierheimRepositoryEx
+            _tierheimRepository.Update(tierheim);
 
         }
-        // Exception Translation
-        catch (RepositoryException ex)
+        catch (ArgumentException ex)
         {
-            throw new ServiceException("HundInsHeim ist fehlgeschlagen, der arme Hund!", ex);
+            throw new TierheimServiceException(
+                "TierheimService#HundInsHeim: Tierheim Validation Error", ex);
+        }
+        catch (TierheimRepositoryException ex)
+        {
+            throw new TierheimServiceException(
+                "TierheimService#HundInsHeim: Tierheim DB Error", ex);
         }
     }
+
 
 
 
@@ -121,28 +109,45 @@ public class TierheimService
     {
         try
         {
-            // Haus exists?
-            Tierheimhaus? haus = _readOnlyTierheimRepository.GetByPK<string, Personal>(dto.TierhausName);
-            if (haus == null)
-                throw new RepositoryException($"Tierheimhaus mit Name {dto.TierhausName} nicht gefunden!");
+            // -> ArgumentEx
+            Tierheimhaus tierheim = _tierheimValidationService.getTierheimById(dto.TierheimId);
 
-            // Map Dto to Katze Domain
+            // -> ArgumentEx
             var katze = new Katze(Guid.NewGuid(), dto.IsAnschmiegsam, dto.Name, dto.Geschlecht, dto.Alter);
+            tierheim.TierInsHeimBringen(katze);
 
-            // Update DB
-            haus.TierInsHeimBringen(katze);
-            _tierheimRepository.Update(haus);
+            // -> TierheimRepositoryEx
+            _tierheimRepository.Update(tierheim);
 
         }
-        // Exception Translation
-        catch (RepositoryException ex)
+        catch (ArgumentException ex)
         {
-            throw new ServiceException("KatzeInsHeim ist fehlgeschlagen, die arme Katze!", ex);
+            throw new TierheimServiceException(
+                "TierheimService#KatzeInsHeim: Tierheim Validation Error", ex);
+        }
+        catch (TierheimRepositoryException ex)
+        {
+            throw new TierheimServiceException(
+                "TierheimService#KatzeInsHeim: Tierheim DB Error", ex);
         }
     }
 
 
 
+    // DELETE TIERHEIM ----------------------------------------------------------
 
+    public void DeleteTierheim(int tierheimId)
+    {
+        try
+        {
+            // -> TierheimRepositoryEx
+            _tierheimRepository.Delete(tierheimId);
+        }
+        catch (TierheimRepositoryException ex)
+        {
+            throw new TierheimServiceException(
+                "TierheimService#DeleteTierheim: Tierheim DB Error", ex);
+        }
+    }
 }
 
